@@ -463,7 +463,7 @@ local t27 = Global:AddToggle("FIingMapItems", false,
 local t28 = Global:AddToggle("BugMap", false, 
     function(state) 
     end, 
-    "Bugs Map will cause People to FallDown (Need Jacket)")
+    "BugsMap People Will Fall")
 
 local Misc = Lib.AddPage("Misc", "Show's Misc Tab")
 
@@ -552,5 +552,36 @@ local b8 = Misc:AddButton("SwordFIingTarget",
     end, 
     "SwordFIings Target (Must Have Sword)")
 
+local Keybinds = Lib.AddPage("Keybinds", "Show's Keybinds Tab")
+
+local x8 = Keybinds:AddBox("FIing: V", 
+    function(text) 
+    end, 
+    "Type another Bind to Change")
+
+local x9 = Keybinds:AddBox("FIingV2: B", 
+    function(text) 
+    end, 
+    "Type another Bind to Change")
+
+local x10 = Keybinds:AddBox("AutoPick: Q", 
+    function(text) 
+    end, 
+    "Type another Bind to Change")
+
+local x11 = Keybinds:AddBox("View: K", 
+    function(text) 
+    end, 
+    "Type another Bind to Change")
+
+local x12 = Keybinds:AddBox("HatFIing: C", 
+    function(text) 
+    end, 
+    "Type another Bind to Change")
+
+local x13 = Keybinds:AddBox("SpinFIing: N", 
+    function(text) 
+    end, 
+    "Type another Bind to Change")
 
 return Lib
