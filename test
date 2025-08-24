@@ -73,7 +73,7 @@ UIGridLayoutTabs.CellSize = UDim2.new(0, 93, 0, 24)
 
 str.Name = "str"
 str.Parent = Holder
-str.Color = Color3.fromRGB(255, 255, 255)
+str.Color = Color3.fromRGB(43, 43, 43)
 str.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
 local Lib = {}
@@ -412,12 +412,12 @@ local t20 = Tools:AddToggle("AutoThrow", false,
     end, 
     "AutoThrows Anvil")
 
-local b3 = Main:AddButton("ClearSelected", 
+local b3 = Tools:AddButton("ClearSelected", 
     function() 
     end, 
     "Clears SelectedPlayer")
 
-local b4 = Main:AddButton("PunchSelected", 
+local b4 = Tools:AddButton("PunchSelected", 
     function() 
     end, 
     "Punches SelectedPlayer")
