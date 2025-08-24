@@ -438,4 +438,118 @@ local t23 = Tools:AddToggle("BombFIingSelected", false,
     end, 
     "BombFIings SelectedPlayer")
 
+local Global = Lib.AddPage("Global", "Show's Global Tab")
+
+local t24 = Tools:AddToggle("BreakMap", false, 
+    function(state) 
+    end, 
+    "Breaks the Map")
+
+local t25 = Tools:AddToggle("LagServer", false, 
+    function(state) 
+    end, 
+    "Lags The Whole Server")
+
+local t26 = Tools:AddToggle("DamageSound", false, 
+    function(state) 
+    end, 
+    "Annoys Player(s) With the Loud Sound")
+
+local t27 = Tools:AddToggle("FIingMapItems", false, 
+    function(state) 
+    end, 
+    "FIings All UnAnchored Items")
+
+local t28 = Tools:AddToggle("BugMap", false, 
+    function(state) 
+    end, 
+    "Bugs Map will cause People to FallDown (Need Jacket)")
+
+local Misc = Lib.AddPage("Misc", "Show's Misc Tab")
+
+local b5 = Misc:AddButton("Big Jacket", 
+    function() 
+    end, 
+    "Must Have Layered (Clothing, Jacket,)")
+
+local b6 = Misc:AddButton("Legs FIing", 
+    function() 
+    end, 
+    "Deletes your Torso and FIings People when Touch")
+
+local t29 = Misc:AddToggle("BetterAnvil", false, 
+    function(state) 
+    end, 
+    "Makes your Anvil Better And Stronger")
+
+local t30 = Tools:AddToggle("Invisible", false, 
+    function(state) 
+    end, 
+    "Makes you Invisible")
+
+local t31 = Tools:AddToggle("PickViewer", false, 
+    function(state) 
+    end, 
+    "Show's you Player(s) Picks")
+
+local t32 = Tools:AddToggle("AutoSword", false, 
+    function(state) 
+    end, 
+    "Auto Get's the Sword")
+
+local t33 = Tools:AddToggle("AutoFarm", false, 
+    function(state) 
+    end, 
+    "AutoFarm's Points")
+
+local t34 = Tools:AddToggle("LowPing", false, 
+    function(state) 
+    end, 
+    "Boost Internet and Lowers Ping")
+
+local t35 = Tools:AddToggle("AntiV2All", false, 
+    function(state) 
+    end, 
+    "Gives Everyone AntiFIingV2")
+
+local t36 = Tools:AddToggle("AntiAnvil", false, 
+    function(state) 
+    end, 
+    "FIings Anvils")
+
+local b7 = Misc:AddButton("Spawn", 
+    function() 
+    end, 
+    "Teleports to Spawn")
+
+local b8 = Misc:AddButton("SafeZone", 
+    function() 
+    end, 
+    "Teleports To SafeZone")
+
+local t37 = Tools:AddToggle("ToolController", false, 
+    function(state) 
+    end, 
+    "Hold a Tool and turn it on Morphs into a Tool")
+
+local x7 = Tools:AddBox("SelectTarget", 
+    function(text) 
+    end, 
+    "Selects a Target(s)")
+
+local t38 = Tools:AddToggle("HatFIingTarget", false, 
+    function(state) 
+    end, 
+    "FIings SelectedTarget with Your Hats")
+
+local b9 = Misc:AddButton("BugTargetscreen", 
+    function() 
+    end, 
+    "Bugs the Target Screen (Must Have Sword)")
+
+local b8 = Misc:AddButton("SwordFIingTarget", 
+    function() 
+    end, 
+    "SwordFIings Target (Must Have Sword)")
+
 return Lib
