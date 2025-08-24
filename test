@@ -1,0 +1,231 @@
+local TS=game:GetService("TweenService");local UIS=game:GetService("UserInputService");local RS=game:GetService("RunService");local LP=game:GetService("Players").LocalPlayer;local CG=game:GetService("CoreGui");local InsertParent=(gethui and gethui()) or CG
+local Theme={Bg=Color3.fromRGB(20,21,24),Panel=Color3.fromRGB(26,27,31),Alt=Color3.fromRGB(32,34,39),Stroke=Color3.fromRGB(65,70,78),Text=Color3.fromRGB(230,232,238),Sub=Color3.fromRGB(154,158,170),Accent=Color3.fromRGB(86,100,255)}
+local function tween(i,t,p) return TS:Create(i,TweenInfo.new(t or .2,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),p) end
+local function mk(obj,props,children) local o=Instance.new(obj) for k,v in pairs(props or {}) do o[k]=v end for _,c in ipairs(children or {}) do c.Parent=o end return o end
+local UI={}
+function UI:CreateWindow(title,size)
+    local G=mk("ScreenGui",{Name="CleanUILib",ResetOnSpawn=false,IgnoreGuiInset=true,Parent=InsertParent})
+    local Root=mk("Frame",{Parent=G,Name="Root",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.new(.5,0,.5,0),Size=size or UDim2.new(0,640,0,380),BackgroundColor3=Theme.Bg})
+    mk("UICorner",{CornerRadius=UDim.new(0,14),Parent=Root})
+    mk("UIStroke",{Parent=Root,Color=Theme.Stroke,Thickness=1.2,ApplyStrokeMode=Enum.ApplyStrokeMode.Border})
+    local Header=mk("Frame",{Parent=Root,Name="Header",Size=UDim2.new(1,0,0,46),BackgroundColor3=Theme.Panel})
+    mk("UICorner",{CornerRadius=UDim.new(0,14),Parent=Header})
+    local Title=mk("TextLabel",{Parent=Header,Text=title or "Window",Font=Enum.Font.GothamBold,TextSize=16,TextColor3=Theme.Text,BackgroundTransparency=1,Position=UDim2.new(0,14,0,0),Size=UDim2.new(1,-120,1,0),TextXAlignment=Enum.TextXAlignment.Left})
+    local Sub=mk("TextLabel",{Parent=Header,Text="RightShift toggle • Drag header",Font=Enum.Font.Gotham,TextSize=13,TextColor3=Theme.Sub,BackgroundTransparency=1,Position=UDim2.new(0,14,0,22),Size=UDim2.new(1,-120,0,20),TextXAlignment=Enum.TextXAlignment.Left})
+    local Close=mk("TextButton",{Parent=Header,Text="×",Font=Enum.Font.GothamBold,TextSize=18,BackgroundTransparency=1,TextColor3=Theme.Sub,AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,-10,.5,0),Size=UDim2.new(0,28,0,28)})
+    local Accent=mk("Frame",{Parent=Header,BackgroundColor3=Theme.Accent,AnchorPoint=Vector2.new(0,1),Position=UDim2.new(0,0,1,0),Size=UDim2.new(1,0,0,2)})
+    local Body=mk("Frame",{Parent=Root,Name="Body",Position=UDim2.new(0,0,0,46),Size=UDim2.new(1,0,1,-46),BackgroundColor3=Theme.Bg})
+    local Left=mk("Frame",{Parent=Body,Name="Left",Size=UDim2.new(0,180,1,0),BackgroundColor3=Theme.Panel})
+    mk("UIStroke",{Parent=Left,Color=Theme.Stroke,Thickness=1})
+    local TabsList=mk("UIListLayout",{Parent=Left,Padding=UDim.new(0,8),FillDirection=Enum.FillDirection.Vertical,HorizontalAlignment=Enum.HorizontalAlignment.Center,VerticalAlignment=Enum.VerticalAlignment.Top})
+    mk("Frame",{Parent=Left,BackgroundTransparency=1,Size=UDim2.new(1,0,0,12)})
+    local Right=mk("Frame",{Parent=Body,Name="Right",Position=UDim2.new(0,180,0,0),Size=UDim2.new(1,-180,1,0),BackgroundTransparency=1})
+    local Pages=mk("Folder",{Parent=Right,Name="Pages"})
+    local dragging=false;local dragStart;local startPos
+    Header.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging=true dragStart=i.Position startPos=Root.Position end end)
+    Header.InputEnded:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging=false end end)
+    UIS.InputChanged:Connect(function(i) if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then local d=(i.Position-dragStart) Root.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+d.X,startPos.Y.Scale,startPos.Y.Offset+d.Y) end end)
+    UIS.InputBegan:Connect(function(i,gp) if gp then return end if i.KeyCode==Enum.KeyCode.RightShift then Root.Visible=not Root.Visible end end)
+    Close.MouseButton1Click:Connect(function() tween(Root,.22,{Size=UDim2.new(0,Root.AbsoluteSize.X,0,0),BackgroundTransparency=1}):Play() task.delay(.23,function() G:Destroy() end) end)
+    local W={}
+    function W:AddTab(name)
+        local Btn=mk("TextButton",{Parent=Left,Text=name or "Tab",Font=Enum.Font.GothamMedium,TextSize=14,TextColor3=Theme.Text,BackgroundColor3=Theme.Alt,Size=UDim2.new(1,-20,0,36),AutoButtonColor=false})
+        mk("UICorner",{Parent=Btn,CornerRadius=UDim.new(0,10)});mk("UIStroke",{Parent=Btn,Color=Theme.Stroke,Thickness=1})
+        Btn.MouseEnter:Connect(function() tween(Btn,.14,{BackgroundColor3=Theme.Accent,TextColor3=Color3.new(1,1,1)}):Play() end)
+        Btn.MouseLeave:Connect(function() tween(Btn,.18,{BackgroundColor3=Theme.Alt,TextColor3=Theme.Text}):Play() end)
+        local Page=mk("Frame",{Parent=Pages,Name=name or "Tab",Size=UDim2.new(1,0,1,0),BackgroundColor3=Theme.Bg,Visible=false})
+        local Pad=mk("UIPadding",{Parent=Page,PaddingTop=UDim.new(0,14),PaddingLeft=UDim.new(0,14),PaddingRight=UDim.new(0,14),PaddingBottom=UDim.new(0,14)})
+        local Grid=mk("UIGridLayout",{Parent=Page,CellPadding=UDim2.new(0,12,0,12),CellSize=UDim2.new(0,280,0,64)})
+        Grid.SortOrder=Enum.SortOrder.LayoutOrder
+        Btn.MouseButton1Click:Connect(function()
+            for _,p in ipairs(Pages:GetChildren()) do if p:IsA("Frame") then p.Visible=false end end
+            Page.Visible=true
+        end)
+        local T={}
+        local function Card(h)
+            local F=mk("Frame",{BackgroundColor3=Theme.Panel,Size=UDim2.new(0,280,0,h or 64)})
+            mk("UICorner",{Parent=F,CornerRadius=UDim.new(0,12)});mk("UIStroke",{Parent=F,Color=Theme.Stroke,Thickness=1})
+            F.Parent=Page
+            return F
+        end
+        function T:Toggle(label,default,callback)
+            local F=Card(64)
+            local L=mk("TextLabel",{Parent=F,Text=label or "Toggle",Font=Enum.Font.GothamMedium,TextSize=14,TextColor3=Theme.Text,BackgroundTransparency=1,Position=UDim2.new(0,14,0,8),Size=UDim2.new(1,-80,0,20),TextXAlignment=Enum.TextXAlignment.Left})
+            local SubT=mk("TextLabel",{Parent=F,Text="",Font=Enum.Font.Gotham,TextSize=12,TextColor3=Theme.Sub,BackgroundTransparency=1,Position=UDim2.new(0,14,0,30),Size=UDim2.new(1,-80,0,18),TextXAlignment=Enum.TextXAlignment.Left})
+            local Btn=mk("TextButton",{Parent=F,BackgroundColor3=Theme.Alt,AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,-12,.5,0),Size=UDim2.new(0,46,0,26),Text=""})
+            mk("UICorner",{Parent=Btn,CornerRadius=UDim.new(1,0)});mk("UIStroke",{Parent=Btn,Color=Theme.Stroke,Thickness=1})
+            local Dot=mk("Frame",{Parent=Btn,BackgroundColor3=Theme.Accent,Size=UDim2.new(0,22,0,22),Position=UDim2.new(0,2,0,2)})
+            mk("UICorner",{Parent=Dot,CornerRadius=UDim.new(1,0)})
+            local on=default and true or false
+            local function set(v)
+                on=v
+                tween(Btn,.16,{BackgroundColor3=on and Color3.fromRGB(40,43,255) or Theme.Alt}):Play()
+                tween(Dot,.16,{Position=on and UDim2.new(1,-24,0,2) or UDim2.new(0,2,0,2)}):Play()
+                if callback then pcall(callback,on) end
+            end
+            Btn.MouseButton1Click:Connect(function() set(not on) end)
+            set(on)
+            return {Set=set,Get=function() return on end}
+        end
+        function T:Button(label,callback)
+            local F=Card(64)
+            local Btn=mk("TextButton",{Parent=F,Text=label or "Button",Font=Enum.Font.GothamMedium,TextSize=14,TextColor3=Theme.Text,BackgroundColor3=Theme.Alt,Size=UDim2.new(1,-24,0,40),Position=UDim2.new(0,12,0,12),AutoButtonColor=false})
+            mk("UICorner",{Parent=Btn,CornerRadius=UDim.new(0,10)});mk("UIStroke",{Parent=Btn,Color=Theme.Stroke,Thickness=1})
+            Btn.MouseEnter:Connect(function() tween(Btn,.12,{BackgroundColor3=Theme.Accent,TextColor3=Color3.new(1,1,1)}):Play() end)
+            Btn.MouseLeave:Connect(function() tween(Btn,.16,{BackgroundColor3=Theme.Alt,TextColor3=Theme.Text}):Play() end)
+            Btn.MouseButton1Click:Connect(function() if callback then pcall(callback) end end)
+            return {}
+        end
+        function T:Box(label,placeholder,callback)
+            local F=Card(64)
+            local L=mk("TextLabel",{Parent=F,Text=label or "Box",Font=Enum.Font.GothamMedium,TextSize=14,TextColor3=Theme.Text,BackgroundTransparency=1,Position=UDim2.new(0,14,0,8),Size=UDim2.new(1,-28,0,18),TextXAlignment=Enum.TextXAlignment.Left})
+            local B=mk("TextBox",{Parent=F,Text="",PlaceholderText=placeholder or "type...",ClearTextOnFocus=false,Font=Enum.Font.Gotham,TextSize=14,TextColor3=Theme.Text,PlaceholderColor3=Theme.Sub,BackgroundColor3=Theme.Alt,Position=UDim2.new(0,12,0,30),Size=UDim2.new(1,-24,0,24)})
+            mk("UICorner",{Parent=B,CornerRadius=UDim.new(0,8)});mk("UIStroke",{Parent=B,Color=Theme.Stroke,Thickness=1})
+            B.FocusLost:Connect(function(e) if e and callback then pcall(callback,B.Text) end end)
+            return {Set=function(v) B.Text=tostring(v) end,Get=function() return B.Text end}
+        end
+        function T:Dropdown(label,options,callback)
+            options=options or {}
+            local open=false
+            local F=Card(64)
+            local L=mk("TextLabel",{Parent=F,Text=label or "Dropdown",Font=Enum.Font.GothamMedium,TextSize=14,TextColor3=Theme.Text,BackgroundTransparency=1,Position=UDim2.new(0,14,0,8),Size=UDim2.new(1,-28,0,18),TextXAlignment=Enum.TextXAlignment.Left})
+            local Btn=mk("TextButton",{Parent=F,BackgroundColor3=Theme.Alt,AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-12,0,26),Size=UDim2.new(0,120,0,26),Text="",AutoButtonColor=false})
+            mk("UICorner",{Parent=Btn,CornerRadius=UDim.new(0,8)});mk("UIStroke",{Parent=Btn,Color=Theme.Stroke,Thickness=1})
+            local Text=mk("TextLabel",{Parent=Btn,Text="Select",Font=Enum.Font.Gotham,TextSize=13,TextColor3=Theme.Text,BackgroundTransparency=1,Position=UDim2.new(0,8,0,0),Size=UDim2.new(1,-26,1,0),TextXAlignment=Enum.TextXAlignment.Left})
+            local Arrow=mk("ImageLabel",{Parent=Btn,BackgroundTransparency=1,Size=UDim2.new(0,18,0,18),AnchorPoint=Vector2.new(1,.5),Position=UDim2.new(1,-6,.5,0),Image="rbxassetid://7072718362",ImageColor3=Theme.Sub})
+            local List=mk("Frame",{Parent=F,BackgroundColor3=Theme.Panel,Size=UDim2.new(1,-24,0,0),Position=UDim2.new(0,12,0,58),Visible=false,ClipsDescendants=true})
+            mk("UICorner",{Parent=List,CornerRadius=UDim.new(0,8)});mk("UIStroke",{Parent=List,Color=Theme.Stroke,Thickness=1})
+            local S=mk("ScrollingFrame",{Parent=List,BackgroundTransparency=1,BorderSizePixel=0,Size=UDim2.new(1,0,1,0),CanvasSize=UDim2.new(),ScrollBarThickness=4})
+            local LL=mk("UIListLayout",{Parent=S,Padding=UDim.new(0,6)})
+            local function rebuild()
+                for _,c in ipairs(S:GetChildren()) do if c:IsA("TextButton") then c:Destroy() end end
+                for _,opt in ipairs(options) do
+                    local O=mk("TextButton",{Parent=S,Text=opt,Font=Enum.Font.Gotham,TextSize=13,TextColor3=Theme.Text,BackgroundColor3=Theme.Alt,Size=UDim2.new(1,-8,0,24),AutoButtonColor=false})
+                    mk("UICorner",{Parent=O,CornerRadius=UDim.new(0,6)});mk("UIStroke",{Parent=O,Color=Theme.Stroke,Thickness=1})
+                    O.MouseEnter:Connect(function() tween(O,.1,{BackgroundColor3=Theme.Accent,TextColor3=Color3.new(1,1,1)}):Play() end)
+                    O.MouseLeave:Connect(function() tween(O,.14,{BackgroundColor3=Theme.Alt,TextColor3=Theme.Text}):Play() end)
+                    O.MouseButton1Click:Connect(function()
+                        Text.Text=opt
+                        if callback then pcall(callback,opt) end
+                        open=false
+                        tween(List,.16,{Size=UDim2.new(1,-24,0,0)}):Play()
+                        task.delay(.16,function() List.Visible=false end)
+                    end)
+                end
+                task.delay(.05,function() S.CanvasSize=UDim2.new(0,0,0,LL.AbsoluteContentSize.Y+8) end)
+            end
+            rebuild()
+            Btn.MouseButton1Click:Connect(function()
+                open=not open
+                if open then
+                    List.Visible=true
+                    tween(List,.16,{Size=UDim2.new(1,-24,0,math.clamp(LL.AbsoluteContentSize.Y+12,80,160))}):Play()
+                else
+                    tween(List,.16,{Size=UDim2.new(1,-24,0,0)}):Play()
+                    task.delay(.16,function() List.Visible=false end)
+                end
+            end)
+            return {Set=function(v) Text.Text=tostring(v) end,Refresh=function(new) options=new rebuild() end}
+        end
+        function T:ColorPicker(label,default,callback)
+            local F=Card(90)
+            local L=mk("TextLabel",{Parent=F,Text=label or "Color",Font=Enum.Font.GothamMedium,TextSize=14,TextColor3=Theme.Text,BackgroundTransparency=1,Position=UDim2.new(0,14,0,8),Size=UDim2.new(1,-28,0,18),TextXAlignment=Enum.TextXAlignment.Left})
+            local Prev=mk("Frame",{Parent=F,BackgroundColor3=default or Theme.Accent,AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-12,0,12),Size=UDim2.new(0,40,0,40)})
+            mk("UICorner",{Parent=Prev,CornerRadius=UDim.new(0,8)});mk("UIStroke",{Parent=Prev,Color=Theme.Stroke,Thickness=1})
+            local Hue=mk("Frame",{Parent=F,BackgroundColor3=Theme.Alt,Position=UDim2.new(0,12,0,36),Size=UDim2.new(1,-68,0,16)})
+            mk("UICorner",{Parent=Hue,CornerRadius=UDim.new(0,8)});mk("UIStroke",{Parent=Hue,Color=Theme.Stroke,Thickness=1})
+            local Sat=mk("Frame",{Parent=F,BackgroundColor3=Theme.Alt,Position=UDim2.new(0,12,0,60),Size=UDim2.new(1,-68,0,16)})
+            mk("UICorner",{Parent=Sat,CornerRadius=UDim.new(0,8)});mk("UIStroke",{Parent=Sat,Color=Theme.Stroke,Thickness=1})
+            local HKnob=mk("Frame",{Parent=Hue,BackgroundColor3=Theme.Accent,Size=UDim2.new(0,10,1,-4),Position=UDim2.new(0,2,0,2)})
+            mk("UICorner",{Parent=HKnob,CornerRadius=UDim.new(1,0)})
+            local SKnob=mk("Frame",{Parent=Sat,BackgroundColor3=Theme.Accent,Size=UDim2.new(0,10,1,-4),Position=UDim2.new(0,2,0,2)})
+            mk("UICorner",{Parent=SKnob,CornerRadius=UDim.new(1,0)})
+            local h=0;s=1;local v=1
+            local function apply()
+                local c=Color3.fromHSV(h,s,v)
+                Prev.BackgroundColor3=c
+                if callback then pcall(callback,c) end
+            end
+            local draggingH=false;local draggingS=false
+            Hue.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 then draggingH=true end end)
+            Sat.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 then draggingS=true end end)
+            UIS.InputEnded:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 then draggingH=false draggingS=false end end)
+            UIS.InputChanged:Connect(function(i)
+                if draggingH and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+                    local rel=(i.Position.X-Hue.AbsolutePosition.X)/Hue.AbsoluteSize.X
+                    h=math.clamp(rel,0,1)
+                    HKnob.Position=UDim2.new(h, -5, 0,2)
+                    apply()
+                end
+                if draggingS and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+                    local rel=(i.Position.X-Sat.AbsolutePosition.X)/Sat.AbsoluteSize.X
+                    s=math.clamp(rel,0,1)
+                    SKnob.Position=UDim2.new(s, -5, 0,2)
+                    apply()
+                end
+            end)
+            apply()
+            return {Set=function(c) local hh,ss,vv=c:ToHSV() h=hh s=ss v=vv HKnob.Position=UDim2.new(h,-5,0,2) SKnob.Position=UDim2.new(s,-5,0,2) Prev.BackgroundColor3=c end,Get=function() return Prev.BackgroundColor3 end}
+        end
+        function T:CharacterViewer()
+            local CardF=Card(280)
+            CardF.Size=UDim2.new(0,280,0,280)
+            local Title=mk("TextLabel",{Parent=CardF,Text="Character Viewer",Font=Enum.Font.GothamBold,TextSize=14,TextColor3=Theme.Text,BackgroundTransparency=1,Position=UDim2.new(0,12,0,8),Size=UDim2.new(1,-24,0,18),TextXAlignment=Enum.TextXAlignment.Left})
+            local RigL=mk("TextLabel",{Parent=CardF,Text="Rig: ?",Font=Enum.Font.Gotham,TextSize=12,TextColor3=Theme.Sub,BackgroundTransparency=1,Position=UDim2.new(0,12,0,26),Size=UDim2.new(1,-24,0,16),TextXAlignment=Enum.TextXAlignment.Left})
+            local Split=mk("Frame",{Parent=CardF,BackgroundTransparency=1,Size=UDim2.new(1,0,0,0),Position=UDim2.new(0,0,0,48)})
+            local View=mk("ViewportFrame",{Parent=CardF,BackgroundColor3=Theme.Bg,AnchorPoint=Vector2.new(0,0),Position=UDim2.new(0,12,0,48),Size=UDim2.new(0,160,0,220)})
+            mk("UICorner",{Parent=View,CornerRadius=UDim.new(0,10)});mk("UIStroke",{Parent=View,Color=Theme.Stroke,Thickness=1})
+            local PartsFrame=mk("ScrollingFrame",{Parent=CardF,BackgroundColor3=Theme.Alt,AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-12,0,48),Size=UDim2.new(0,96,0,220),BorderSizePixel=0,CanvasSize=UDim2.new(),ScrollBarThickness=4})
+            mk("UICorner",{Parent=PartsFrame,CornerRadius=UDim.new(0,10)});mk("UIStroke",{Parent=PartsFrame,Color=Theme.Stroke,Thickness=1})
+            local L=mk("UIListLayout",{Parent=PartsFrame,Padding=UDim.new(0,6)})
+            local Camera=Instance.new("Camera");Camera.Parent=View;View.CurrentCamera=Camera
+            local Cloned;local Highlight=Instance.new("Highlight");Highlight.FillTransparency=.6;Highlight.OutlineTransparency=.1;Highlight.FillColor=Theme.Accent;Highlight.OutlineColor=Theme.Accent;Highlight.Enabled=false;Highlight.Parent=View
+            local function buildParts()
+                for _,c in ipairs(PartsFrame:GetChildren()) do if c:IsA("TextButton") then c:Destroy() end end
+                if not Cloned then return end
+                local function add(name,part)
+                    local B=mk("TextButton",{Parent=PartsFrame,Text=name,Font=Enum.Font.Gotham,TextSize=12,TextColor3=Theme.Text,BackgroundColor3=Theme.Panel,Size=UDim2.new(1,-8,0,22),AutoButtonColor=false})
+                    mk("UICorner",{Parent=B,CornerRadius=UDim.new(0,8)});mk("UIStroke",{Parent=B,Color=Theme.Stroke,Thickness=1})
+                    B.MouseEnter:Connect(function() tween(B,.1,{BackgroundColor3=Theme.Accent,TextColor3=Color3.new(1,1,1)}):Play() end)
+                    B.MouseLeave:Connect(function() tween(B,.14,{BackgroundColor3=Theme.Panel,TextColor3=Theme.Text}):Play() end)
+                    B.MouseButton1Click:Connect(function()
+                        Highlight.Adornee=part
+                        Highlight.Enabled=true
+                    end)
+                end
+                for _,d in ipairs(Cloned:GetDescendants()) do
+                    if d:IsA("BasePart") then add(d.Name,d) end
+                end
+                task.delay(.05,function() PartsFrame.CanvasSize=UDim2.new(0,0,0,L.AbsoluteContentSize.Y+8) end)
+            end
+            local function refreshChar()
+                View:ClearAllChildren()
+                Camera.Parent=View;View.CurrentCamera=Camera
+                local Char=LP.Character or LP.CharacterAdded:Wait()
+                RigL.Text="Rig: "..(Char:FindFirstChildWhichIsA("Humanoid") and tostring(Char:FindFirstChildWhichIsA("Humanoid").RigType):gsub("Enum%.HumanoidRigType%.","") or "?")
+                Cloned=Char:Clone();for _,d in ipairs(Cloned:GetDescendants()) do if d:IsA("Script") or d:IsA("LocalScript") then d:Destroy() end end
+                Cloned.Parent=View
+                local cf=Cloned:GetModelCFrame()
+                Camera.CFrame=CFrame.new(cf.Position+Vector3.new(3,2,6),cf.Position)
+                buildParts()
+            end
+            refreshChar()
+            LP.CharacterAdded:Connect(function() task.wait(1) refreshChar() end)
+            task.spawn(function() local a=0 while View.Parent do a+=RS.Heartbeat:Wait()*25 if Cloned and Cloned.PrimaryPart then local p=Cloned:GetModelCFrame().Position Camera.CFrame=CFrame.new(p+Vector3.new(math.cos(math.rad(a))*6,2.5,math.sin(math.rad(a))*6),p) end end end)
+            return {}
+        end
+        return T,Btn,Page
+    end
+    return W,Root
+end
+
+local Window=UI:CreateWindow("Clean UI",UDim2.new(0,720,0,420))
+local Main,MainBtn,MainPage=Window:AddTab("Main")
+local ViewerTab=Window:AddTab("Viewer")
+local Tog=Main:Toggle("Godmode",false,function(v) end)
+local Btn=Main:Button("Execute",function() end)
+local Box=Main:Box("WalkSpeed","16",function(txt) end)
+local Drop=Main:Dropdown("Choose Map",{"Forest","Desert","City","Ocean"},function(opt) end)
+local Picker=Main:ColorPicker("Accent",Theme.Accent,function(c) end)
+ViewerTab:CharacterViewer()
+for _,p in ipairs(MainPage.Parent:GetChildren()) do if p:IsA("Frame") and p~=MainPage then p.Visible=false end end
