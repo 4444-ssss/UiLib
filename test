@@ -5,10 +5,10 @@ end
 
 local plrs = game:GetService'Players'
 local plr = plrs.LocalPlayer
+local SpinFlingActive = {}
 local ILoopFlingV1 = {}
 local ILoopFlingV2 = {}
 local HiddenFIingEnabled = false
-local SpinFlingActive = {}
 
 local function findplr(Target)
     if game:GetService'Players':FindFirstChild(Target) then
