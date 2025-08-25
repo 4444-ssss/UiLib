@@ -5,111 +5,18 @@ end
 
 local plrs = game:GetService'Players'
 local plr = plrs.LocalPlayer
-local FIing = {}
-local FIingV2 = {}
-local LoopFIing = {}
-local LoopFIingV2 = {}
 
-local function addFIing(target)
-    if target and not FIing[target.Name] then
-        FIing[target.Name] = target
-    end
-end
 
-local function addFIingV2(target)
-    if target and not FIingV2[target.Name] then
-        FIingV2[target.Name] = target
-    end
-end
 
-local function addLoopFIing(target)
-    if target and not LoopFIing[target.Name] then
-        LoopFIing[target.Name] = target
-    end
-end
 
-local function addLoopFIingV2(target)
-    if target and not LoopFIingV2[target.Name] then
-        LoopFIingV2[target.Name] = target
-    end
-end
 
-spawn(function()
-    while true do
-        wait(0.1)
-        for _, v in next, FIing do
-            pcall(function()
-                if v.Character then
-                    local accs = v.Character:FindFirstChildOfClass('Accessory')
-                    if accs then
-                        if accs:FindFirstChild('Handle') then
-                            plr.Character.Picking:FireServer(accs.Handle, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
-                        elseif accs:IsA('BasePart') then
-                            plr.Character.Picking:FireServer(accs, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
-                        end
-                        wait(0.1)
-                        plr.Character.PuttingDown:FireServer()
-                    else
-                        plr.Character.Picking:FireServer(v.Character.HumanoidRootPart, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
-                        wait(0.1)
-                        plr.Character.PuttingDown:FireServer()
-                    end
-                end
-            end)
-        end
 
-        for _, v in next, FIingV2 do
-            pcall(function()
-                if v.Character then
-                    v.Character.ArmAngleChange:FireServer(CFrame.new(8.99999981e+37, -999, 8.99999981e+37))
-                end
-            end)
-        end
 
-        for _, v in next, LoopFIing do
-            pcall(function()
-                if v.Character then
-                    local accs = v.Character:FindFirstChildOfClass('Accessory')
-                    if accs then
-                        if accs:FindFirstChild('Handle') then
-                            plr.Character.Picking:FireServer(accs.Handle, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
-                        elseif accs:IsA('BasePart') then
-                            plr.Character.Picking:FireServer(accs, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
-                        end
-                        wait(0.1)
-                        plr.Character.PuttingDown:FireServer()
-                    else
-                        plr.Character.Picking:FireServer(v.Character.HumanoidRootPart, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
-                        wait(0.1)
-                        plr.Character.PuttingDown:FireServer()
-                    end
-                end
-            end)
-        end
 
-        for _, v in next, LoopFIingV2 do
-            pcall(function()
-                if v.Character then
-                    v.Character.ArmAngleChange:FireServer(CFrame.new(math.huge, -999, math.huge))
-                end
-            end)
-        end
-    end
-end)
 
-function findplr(playerName)
-    local target = game:GetService("Players"):FindFirstChild(playerName)
-    if target then
-        return target
-    else
-        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
-            if player.Name:lower():sub(1, #playerName) == playerName:lower() or player.DisplayName:lower():sub(1, #playerName) == playerName:lower() then
-                return player
-            end
-        end
-    end
-    return nil
-end
+
+
+
 
 local GUI = Instance.new("ScreenGui")
 local Container = Instance.new("Frame")
@@ -424,63 +331,103 @@ local t8 = Main:AddToggle("NoRagdollCD", false,
     end, 
     "Deletes Ragdoll Cooldown")
 
+local function findplr(Target)
+    if game:GetService'Players':FindFirstChild(Target) then
+        return game:GetService'Players':FindFirstChild(Target)
+    else
+        if Target ~= nil and Target ~= "" and Target ~= " " and Target then
+            local name = Target
+            local found = false
+            for _,v in pairs(game:GetService'Players':GetPlayers()) do 
+                if not found and (v.Name:lower():sub(1,#name) == name:lower() or v.DisplayName:lower():sub(1,#name) == name:lower()) then
+                    name = v
+                    found = true
+                end
+            end
+            if name ~= nil and name ~= Target then
+                return name
+            end
+        end
+    end
+end
+
 local t9 = Main:AddToggle("HiddenFIing", false, 
     function(state) 
+        if state then
+            for _, v in pairs(plr.Character:GetChildren()) do
+                if v:IsA("BasePart") then
+                    v.CustomPhysicalProperties = PhysicalProperties.new(1000, 1000, 0, 1000, 0)
+                end
+            end
+        else
+            for _, v in pairs(plr.Character:GetChildren()) do
+                if v:IsA("BasePart") then
+                    v.CustomPhysicalProperties = PhysicalProperties.new(0.3, 0.2, 0, 0.2, 0.2)
+                end
+            end
+        end
     end, 
     "Makes your FIing/LoopFIing better")
 
-local f1_box = addBox('FIing', Main, 'Fling player')
-f1_box.FocusLost:Connect(function(enterPressed)
-    if enterPressed then
-        pcall(function()
-            local tar = findplr(f1_box.Text)
-            if tar then
-                addFIing(tar)
+local x1 = Main:AddBox("FIing", 
+    function(text, enter) 
+        local target = findplr(text)
+        if target then
+            local accs = target.Character:FindFirstChildOfClass'Accessory'
+            if accs then
+                if accs:FindFirstChild'Handle' then
+                    plr.Character.Picking:FireServer(accs.Handle, Vector3.new(math.random(-math.huge, math.huge), math.random(-math.huge, math.huge), math.random(-math.huge, math.huge)))
+                elseif accs:IsA'BasePart' then
+                    plr.Character.Picking:FireServer(accs, Vector3.new(math.random(-math.huge, math.huge), math.random(-math.huge, math.huge), math.random(-math.huge, math.huge)))
+                end
+                wait(0.1)
+                plr.Character.PuttingDown:FireServer()
+            else
+                plr.Character.Picking:FireServer(target.Character.HumanoidRootPart, Vector3.new(math.random(-math.huge, math.huge), math.random(-math.huge, math.huge), math.random(-math.huge, math.huge)))
+                wait(0.1)
+                plr.Character.PuttingDown:FireServer()
             end
-        end)
-        f1_box.Text = ''
-    end
-end)
-
-local f2_box = addBox('FIing v2', Main, 'Fling player')
-f2_box.FocusLost:Connect(function(enterPressed)
-    if enterPressed then
-        pcall(function()
-            local tar = findplr(f2_box.Text)
-            if tar then
-                addFIingV2(tar)
-            end
-        end)
-        f2_box.Text = ''
-    end
-end)
-
-local lf1_box = addBox('Loop FIing', Main, 'Loop fling player')
-lf1_box.FocusLost:Connect(function(enterPressed)
-    if enterPressed then
-        local tar = findplr(lf1_box.Text)
-        if tar then
-            addLoopFIing(tar)
         end
-        lf1_box.Text = ''
-    end
-end)
+        x1.Text = 'FIing'
+    end, 
+    "FIing Target")
 
-local lf2_box = addBox('Loop FIing v2', Main, 'Loop fling player')
-lf2_box.FocusLost:Connect(function(enterPressed)
-    if enterPressed then
-        local tar = findplr(lf2_box.Text)
-        if tar then
-            addLoopFIingV2(tar)
+local x2 = Main:AddBox("FIingV2", 
+    function(text, enter) 
+        local target = findplr(text)
+        if target then
+            target.Character.ArmAngleChange:FireServer(CFrame.new(math.random(-math.huge, math.huge), math.random(-math.huge, math.huge), math.random(-math.huge, math.huge)))
         end
-        lf2_box.Text = ''
-    end
-end)
+        x2.Text = 'FIingv2' 
+    end, 
+    "Fling V2 Target")
 
-addButton('Clear LoopFling', Main, 'Stop loop fling').MouseButton1Down:Connect(function()
-    LoopFIing = {}
-    LoopFIingV2 = {}
-end)
+local x3 = Main:AddBox("LoopFIing", 
+    function(text, enter) 
+        local target = findplr(text)
+        if target and not LoopFlingV1[target.Name] then
+            LoopFlingV1[target.Name] = target
+        end
+        x3.Text = 'LoopFIing'
+    end, 
+    "LoopFIing Target")
+
+local x4 = Main:AddBox("LoopFIingV2", 
+    function(text, enter) 
+        local target = findplr(text)
+        if target and not LoopFlingV2[target.Name] then
+            LoopFlingV2[target.Name] = target
+        end
+        x4.Text = 'LoopFIing v2'
+    end, 
+    "LoopFIing V2 Target")
+
+local b1 = Main:AddButton("ClearLoop", 
+    function() 
+        LoopFlingV1 = {}
+        LoopFlingV2 = {}
+    end, 
+    "Clears LoopFIing/FIing")
 
 local t10 = Main:AddToggle("InfinitePunch", false, 
     function(state) 
