@@ -1,4 +1,4 @@
-local message = "Script Executed Successfully!" -- Message to display
+local message = "SAASDASDASD!" -- Message to display
 local duration = 3 -- Duration in seconds
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
@@ -376,7 +376,7 @@ x1.FocusLost:Connect(function()
             plr.Character.PuttingDown:FireServer()
         end
     end)
-    x1.Text = 'FIings Target'
+    x1.Text = ''
 end)
 
 local x2 = Main:AddBox("FIingV2", "FIingsV2 Target")
@@ -397,7 +397,7 @@ x2.FocusLost:Connect(function()
             wait(0.1)
         end
     end)
-    x2.Text = 'FIingsV2 Target'
+    x2.Text = ''
 end)
 
 local x3 = Main:AddBox("LoopFIings", "LoopFIings Target")
@@ -406,7 +406,7 @@ x3.FocusLost:Connect(function()
     if tar and not LoopFlingV1[tar.Name] then
         LoopFlingV1[tar.Name] = tar
     end
-    x3.Text = 'LoopFIings Target'
+    x3.Text = ''
 end)
 
 local x4 = Main:AddBox("LoopFIingV2", "LoopFIingsV2 Target")
@@ -415,7 +415,7 @@ x4.FocusLost:Connect(function()
     if tar and not LoopFlingV2[tar.Name] then
         LoopFlingV2[tar.Name] = tar
     end
-    x4.Text = 'LoopFIingsV2 Target'
+    x4.Text = ''
 end)
 
 local b1 = Main:AddButton("ClearLoop", function()
@@ -478,39 +478,6 @@ local t11 = Main:AddToggle("NoClip", false,
 
 local x5 = Main:AddBox("SpinFIing", "SpinFIings Target")
 x5.FocusLost:Connect(function()
-    local target = findplr(x5.Text)
-    if target and target.Character then
-        local targetTorso = target.Character:FindFirstChild("HumanoidRootPart")
-        if targetTorso then
-            plr.Character:SetPrimaryPartCFrame(targetTorso.CFrame)
-            local gyro = Instance.new("BodyGyro", plr.Character.HumanoidRootPart)
-            gyro.MaxTorque = Vector3.new(400000, 400000, 400000)
-            gyro.CFrame = plr.Character.HumanoidRootPart.CFrame
-            gyro.D = 5000
-            local flingConnection
-            flingConnection = target.Character:WaitForChild("Humanoid").Died:Connect(function()
-                gyro:Destroy()
-                pcall(function()
-                    local accs = target.Character:FindFirstChildOfClass("Accessory")
-                    if accs then
-                        if accs:FindFirstChild("Handle") then
-                            plr.Character.Picking:FireServer(accs.Handle, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
-                            wait(0.1)
-                            plr.Character.PuttingDown:FireServer()
-                        elseif accs:IsA("BasePart") then
-                            plr.Character.Picking:FireServer(accs, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
-                            wait(0.1)
-                            plr.Character.PuttingDown:FireServer()
-                        end
-                    else
-                        plr.Character.Picking:FireServer(target.Character.HumanoidRootPart, Vector3.new(9e37, -9e37, 9e37))
-                        wait(0.1)
-                        plr.Character.PuttingDown:FireServer()
-                    end
-                end)
-            end)
-        end
-    end
 end)
 
 local t12 = Main:AddToggle("AutoPunch", false, 
