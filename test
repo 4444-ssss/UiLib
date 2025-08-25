@@ -3,10 +3,6 @@ if FGUI then
     FGUI:Destroy()
 end
 
-local plrs = game:GetService("Players")
-local plr = plrs.LocalPlayer
-local prop1000 = PhysicalProperties.new(1000,1000,0,1000,0)
-
 local GUI = Instance.new("ScreenGui")
 local Container = Instance.new("Frame")
 local lbl = Instance.new("TextLabel")
@@ -238,7 +234,7 @@ function Lib.AddPage(name, hovertip)
         return Button
     end
 
-    function pageApi:AddBox(placeholderText, callbackOnFocusLost, hovertipText)
+    function pageApi:AddBox(placeholderText, hovertipText)
         local Box = Instance.new("TextBox")
         Box.Name = "Box_" .. (placeholderText or "Input")
         Box.Parent = PageFrame
@@ -259,8 +255,16 @@ function Lib.AddPage(name, hovertip)
         UIStroke.Color = Color3.fromRGB(43, 43, 43)
         UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-        Box.FocusLost:Connect(function(enterPressed)
-            if callbackOnFocusLost then task.spawn(callbackOnFocusLost, Box.Text, enterPressed) end
+        local baseText = lbl.Text
+        Box.MouseEnter:Connect(function()
+            lbl.Text = hovertipText or ("Input: " .. (Box.Text == "" and "(empty)" or Box.Text))
+        end)
+        Box.MouseLeave:Connect(function()
+            lbl.Text = baseText
+        end)
+
+        return Box
+    end
             typeIntoLabel(hovertipText or ("Input: " .. (Box.Text == "" and "(empty)" or Box.Text)))
         end)
 
@@ -273,129 +277,34 @@ function Lib.AddPage(name, hovertip)
     return pageApi
 end
 
-local Main = Lib.AddPage("Main", "Show's Main Tab")
+return Lib
 
-local connections = {}
+local Main = Lib.AddPage("Main", "Show's Main Tab")
 
 local t1 = Main:AddToggle("AntiFIing", false, 
     function(state) 
-        if state then
-            connections["AntiFIing"] = workspace.DescendantAdded:Connect(function(child)
-                if child.Name == 'Stabler' then
-                    if child:WaitForChild('ConnectedWeld', 10).Part1:IsDescendantOf(plr.Character) then
-                        child:Destroy()
-                    end
-                end
-            end)
-        else
-            if connections["AntiFIing"] then
-                connections["AntiFIing"]:Disconnect()
-                connections["AntiFIing"] = nil
-            end
-        end
     end, 
-    "Prevents from getting Flung"
-)
+    "Prevents from getting Flung")
 
 local t2 = Main:AddToggle("AntiRagdoll", false, 
     function(state) 
-        if state then
-            connections["AntiRagdoll"] = plr.CharacterAdded:Connect(function(character)
-                local ragdoll = character:WaitForChild("Ragdoll", 10)
-                if ragdoll then
-                    ragdoll:Destroy()
-                end
-            end)
-        else
-            if connections["AntiRagdoll"] then
-                connections["AntiRagdoll"]:Disconnect()
-                connections["AntiRagdoll"] = nil
-            end
-        end
     end, 
-    "Prevents from Ragdolling"
-)
+    "Prevents from Ragdolling")
 
 local t3 = Main:AddToggle("NoFallDamage", false, 
     function(state) 
-        if state then
-            connections["NoFallDamage"] = plr.CharacterAdded:Connect(function()
-                for _, v in next, plr.Character:GetChildren() do
-                    if v.Name == 'VelocityDamage' or v.Name == 'Stabler' then
-                        v:Destroy()
-                    end
-                end
-            end)
-        else
-            if connections["NoFallDamage"] then
-                connections["NoFallDamage"]:Disconnect()
-                connections["NoFallDamage"] = nil
-            end
-        end
     end, 
-    "FallDamage Won't Effect"
-)
-
+    "FallDamage Won't Effect")
 
 local t4 = Main:AddToggle("AntiSpinner", false, 
     function(state) 
-        if state then
-            Settings['AntiSpinner'] = true
-            for _, part in next, plr.Character:GetChildren() do
-                if part:IsA('BasePart') then
-                    part.CustomPhysicalProperties = prop1000
-                end
-            end
-        else
-            Settings['AntiSpinner'] = false
-            for _, part in next, plr.Character:GetChildren() do
-                if part:IsA('BasePart') then
-                    part.CustomPhysicalProperties = PhysicalProperties.new(0.3, 0.2, 0, 0.2, 0.2)
-                end
-            end
-        end
     end, 
-    "Prevents from getting flung by spinners"
-)
+    "Activates/Deactivates AntiSpinner")
 
 local t5 = Main:AddToggle("AutoRespawn", false, 
     function(state) 
-        if state then
-            plr.CharacterAdded:Connect(function()
-                repeat wait() until plr.Character:FindFirstChild("Humanoid")
-                
-                while true do
-                    if plr.Character.Humanoid.Health <= 0 then
-                        repeat wait() until plr.Character:FindFirstChild("HumanoidRootPart")
-                        respawn()
-                    end
-                    wait(1)
-                end
-            end)
-        else
-        end
     end, 
-    "AutoRespawns By its own"
-)
-
-local function respawn()
-    pcall(function()
-        local b = plr.PlayerGui.DeathMenu.Frame.Button.TextButton
-        b.Position = UDim2.new(0, 0, 0, 0)
-        b.Size = UDim2.new(1, 0, 1, 0)
-        b.Text = ''
-        b.BackgroundTransparency = 1
-        b.ZIndex = (2^31-1)
-        local s = Instance.new('ScreenGui', game:GetService('CoreGui'))
-        b.Parent = s
-        vim:SendMouseButtonEvent(b.AbsolutePosition.X + b.AbsoluteSize.X / 2, b.AbsolutePosition.Y + b.AbsoluteSize.Y / 2, 0, true, game, 0)
-        vim:SendMouseButtonEvent(b.AbsolutePosition.X + b.AbsoluteSize.X / 2, b.AbsolutePosition.Y + b.AbsoluteSize.Y / 2, 0, false, game, 0)
-        spawn(function()
-            wait()
-            s:Destroy()
-        end)
-    end)
-end
+    "AutoRespawns By its own")
 
 local t6 = Main:AddToggle("MovementHack", false, 
     function(state) 
@@ -417,25 +326,21 @@ local t9 = Main:AddToggle("HiddenFIing", false,
     end, 
     "Makes your FIing/LoopFIing better")
 
-local x1 = Main:AddBox("FIing", 
-    function(text, enter) 
-    end, 
-    "FIings Target")
+local x1 = Main:AddBox("FIing", "FIings Target")
+x1.FocusLost:Connect(function()
+end)
 
-local x2 = Main:AddBox("FIingV2", 
-    function(text, enter) 
-    end, 
-    "FIingsV2 Target")
+local x2 = Main:AddBox("FIingV2", "FIingsV2 Target")
+x2.FocusLost:Connect(function()
+end)
 
-local x3 = Main:AddBox("LoopFIing", 
-    function(text, enter) 
-    end, 
-    "LoopFIings Target")
+local x3 = Main:AddBox("LoopFIings", "LoopFIings Target")
+x3.FocusLost:Connect(function()
+end)
 
-local x4 = Main:AddBox("LoopFIingV2", 
-    function(text, enter) 
-    end, 
-    "LoopFIingsV2 Target")
+local x4 = Main:AddBox("LoopFIingV2", "LoopFIingsV2 Target")
+x4.FocusLost:Connect(function()
+end)
 
 local b1 = Main:AddButton("ClearLoop", 
     function() 
@@ -452,10 +357,9 @@ local t11 = Main:AddToggle("NoClip", false,
     end, 
     "Gives you NoClip")
 
-local x5 = Main:AddBox("SpinFIing", 
-    function(text, enter) 
-    end, 
-    "SpinFIings Target")
+local x5 = Main:AddBox("SpinFIing", "SpinFIings Target")
+x5.FocusLost:Connect(function()
+end)
 
 local t12 = Main:AddToggle("AutoPunch", false, 
     function(state) 
@@ -479,10 +383,9 @@ local b2 = Main:AddButton("PermaGod",
 
 local Tools = Lib.AddPage("Tools", "Show's Tools Tab")
 
-local x6 = Tools:AddBox("SelectPlayer", 
-    function(text) 
-    end, 
-    "Selects a Target(s)")
+local x6 = Tools:AddBox("SelectPlayer", "Type Player(s) Name or Display")
+x6.FocusLost:Connect(function()
+end)
 
 local t15 = Tools:AddToggle("AnvilKill", false, 
     function(state) 
@@ -633,10 +536,9 @@ local t37 = Misc:AddToggle("ToolController", false,
     end, 
     "Hold a Tool and turn it on Morphs into a Tool")
 
-local x7 = Misc:AddBox("SelectTarget", 
-    function(text) 
-    end, 
-    "Selects a Target(s)")
+local x7 = Misc:AddBox("SelectTarget", "SelectTarget(s) Name or Display")
+x7.FocusLost:Connect(function()
+end)
 
 local t38 = Misc:AddToggle("HatFIingTarget", false, 
     function(state) 
@@ -655,34 +557,26 @@ local b8 = Misc:AddButton("SwordFIingTarget",
 
 local Keybinds = Lib.AddPage("Keybinds", "Show's Keybinds Tab")
 
-local x8 = Keybinds:AddBox("FIing: V", 
-    function(text) 
-    end, 
-    "Type another Bind to Change")
+local x8 = Keybinds:AddBox("FIing", "Type any Letter to Change Bind")
+x8.FocusLost:Connect(function()
+end)
 
-local x9 = Keybinds:AddBox("FIingV2: B", 
-    function(text) 
-    end, 
-    "Type another Bind to Change")
+local x9 = Keybinds:AddBox("FIingV2", "Type any Letter to Change Bind")
+x9.FocusLost:Connect(function()
+end)
 
-local x10 = Keybinds:AddBox("AutoPick: Q", 
-    function(text) 
-    end, 
-    "Type another Bind to Change")
+local x10 = Keybinds:AddBox("AutoPick", "Type any Letter to Change Bind")
+x10.FocusLost:Connect(function()
+end)
 
-local x11 = Keybinds:AddBox("View: K", 
-    function(text) 
-    end, 
-    "Type another Bind to Change")
+local x11 = Keybinds:AddBox("View", "Type any Letter to Change Bind")
+x11.FocusLost:Connect(function()
+end)
 
-local x12 = Keybinds:AddBox("HatFIing: C", 
-    function(text) 
-    end, 
-    "Type another Bind to Change")
+local x12 = Keybinds:AddBox("HatFIing", "Type any Letter to Change Bind")
+x12.FocusLost:Connect(function()
+end)
 
-local x13 = Keybinds:AddBox("SpinFIing: N", 
-    function(text) 
-    end, 
-    "Type another Bind to Change")
-
-return Lib
+local x13 = Keybinds:AddBox("SpinFIing", "Type any Letter to Change Bind")
+x13.FocusLost:Connect(function()
+end)
