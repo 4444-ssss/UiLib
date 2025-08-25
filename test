@@ -5,10 +5,22 @@ end
 
 local plrs = game:GetService("Players")
 local plr = plrs.LocalPlayer
+local rnsv = game:GetService("RunService")
 local character = plr.Character or plr.CharacterAdded:Wait()
 local LoopFlingV1 = {}
 local LoopFlingV2 = {}
-
+local head = character:WaitForChild("Head")
+local anvils = {}
+local targets = {}
+local whitelist = {}
+local Radius = 4
+local Speed = 2.2
+local Height = 1.6
+workspace.FallenPartsDestroyHeight = 0/0
+local Velocity = -9e37
+local anvilKillToggle = false
+local anvilKillAllToggle = false
+local anvilOrbitToggle = false
 local function findplr(Target)
     local player = plrs:FindFirstChild(Target)
     if player then
@@ -23,6 +35,13 @@ local function findplr(Target)
     return nil
 end
 
+local function updateHeight()
+    if HideAnvilToggle then
+        Height = -99  -- Set height to -99 when HideAnvil is on
+    else
+        Height = 1.6  -- Reset height to normal when HideAnvil is off
+    end
+end
 
 
 
@@ -496,28 +515,6 @@ local b2 = Main:AddButton("PermaGod",
 
 local Tools = Lib.AddPage("Tools", "Show's Tools Tab")
 
-local x6 = Tools:AddBox("SelectPlayer", "Type Player(s) Name or Display")
-x6.FocusLost:Connect(function()
-end)
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local plr = Players.LocalPlayer
-local character = plr.Character or plr.CharacterAdded:Wait()
-local head = character:WaitForChild("Head")
-
-local anvils = {}
-local targets = {}
-local whitelist = {}
-local killAll = false
-local Radius = 3.4
-local Speed = 2.2
-local Height = 1.6
-workspace.FallenPartsDestroyHeight = 0/0
-local Velocity = -9e37
-local anvilKillToggle = false
-local anvilKillAllToggle = false
-
 local function addAnvil(anvil)
     table.insert(anvils, anvil)
     anvil.Parent = workspace
@@ -548,9 +545,9 @@ local function AnvilPosition()
         anvil.Position = plrPos
         anvil.CFrame = CFrame.new(anvil.Position, head.Position)
         anvil.Velocity = (anvil.Position - head.Position).unit * Velocity
-        if anvilKillToggle or anvilKillAllToggle then
+        if anvilOrbitToggle then
             for userId, _ in pairs(targets) do
-                local target = Players:GetPlayerByUserId(userId)
+                local target = plrs:GetPlayerByUserId(userId)
                 if target and target.Character and not whitelist[userId] then
                     local torso = target.Character:FindFirstChild("UpperTorso") or target.Character:FindFirstChild("HumanoidRootPart")
                     if torso then
@@ -563,15 +560,14 @@ local function AnvilPosition()
     end
 end
 
-RunService.Heartbeat:Connect(AnvilPosition)
+rnsv.Heartbeat:Connect(AnvilPosition)
 
 local function CharacterAdded(Character)
-    character = Character
     head = Character:WaitForChild("Head")
     FindAnvils()
 end
 
-plr.CharacterAdded:Connect(CharacterAdded)
+plrs.PlayerAdded:Connect(CharacterAdded)
 
 workspace.ChildAdded:Connect(function(child)
     if child:IsA("BasePart") and child.Name == "Anvil" then
@@ -586,20 +582,10 @@ coroutine.wrap(function()
     end
 end)()
 
-local function findPlayer(name)
-    name = name:lower()
-    for _, p in pairs(Players:GetPlayers()) do
-        if p.Name:lower():sub(1, #name) == name or (p.DisplayName and p.DisplayName:lower():sub(1, #name) == name) then
-            return p
-        end
-    end
-    return nil
-end
-
 local function updateTargetList()
     targets = {}
     if anvilKillAllToggle then
-        for _, p in pairs(Players:GetPlayers()) do
+        for _, p in pairs(plrs:GetPlayers()) do
             if p ~= plr and not whitelist[p.UserId] then
                 targets[p.UserId] = true
             end
@@ -625,10 +611,14 @@ local function toggleAnvilKillAll(state)
     end
 end
 
+local function toggleAnvilOrbit(state)
+    anvilOrbitToggle = state
+end
+
 local x6 = Tools:AddBox("SelectPlayer", "Type Player(s) Name or Display")
 x6.FocusLost:Connect(function()
     local playerName = x6.Text
-    local player = findPlayer(playerName)
+    local player = findplr(playerName)
     if player then
         targets[player.UserId] = true
         x6.Text = ''
@@ -645,36 +635,115 @@ end, "AnvilKills All Players")
 
 local t17 = Tools:AddToggle("AnvilOrbit", false, 
     function(state) 
-        if state then
-            anvilKillToggle = false
-            anvilKillAllToggle = false
-        else
-            anvilKillToggle = true
-            anvilKillAllToggle = true
-        end
+        toggleAnvilOrbit(state)
     end, 
     "Orbits Anvil When Thrown")
 
-Players.PlayerAdded:Connect(function(p)
+plrs.PlayerAdded:Connect(function(p)
     if anvilKillAllToggle and p ~= plr and not whitelist[p.UserId] then
         targets[p.UserId] = true
     end
 end)
 
+local rnsv = game:GetService("RunService")
+
+local anvilsFired = false
+
 local t18 = Tools:AddToggle("FIingAnvils", false, 
     function(state) 
+        if state then
+            anvilsFired = true
+            c()
+        else
+            anvilsFired = false
+        end
     end, 
     "FIings All Anvils")
 
+local function c()
+    rnsv.Heartbeat:Connect(function()
+        if not anvilsFired then return end
+        if not plr.Parent then return end
+
+        for _, v in pairs(workspace:GetChildren()) do
+            if v:IsA("BasePart") and v.Name == "Anvil" and v:FindFirstChild("Script") and v.Script:FindFirstChild("Value") and v.Script.Value ~= plr then
+                plr.Character.Picking:FireServer(v, Vector3.new(9e38, -9e38, 9e38))
+                task.wait(0.1)
+                plr.Character.PuttingDown:FireServer()
+            end
+        end
+    end)
+end
+
 local t19 = Tools:AddToggle("HideAnvil", false, 
     function(state) 
+        HideAnvilToggle = state
+        updateHeight()  -- Update the height when HideAnvil is toggled
     end, 
     "HidesAnvils")
 
+local anvilEnabled = false
+local anvilConnection
+
+local function activateAnvil()
+    if anvilEnabled then
+        local c = 0
+        repeat
+            rnsv.RenderStepped:Wait()
+            c = c + 1
+        until (plr.Character
+            and plr.Character:FindFirstChild("HumanoidRootPart")
+            and plr:FindFirstChild("Backpack")
+            and plr.Backpack:FindFirstChild("Anvil"))
+            or c >= 200
+
+        if c < 200 then
+            local tool = plr.Backpack.Anvil
+            if not plr.Character:FindFirstChild("Anvil") then
+                tool.Parent = plr.Character
+                task.wait(0.1)
+                tool:Activate()
+                if plr.Character:FindFirstChild("Anvil") then
+                    while anvilEnabled do
+                        plr.Character.Anvil.send:FireServer(
+                            plr.Character.HumanoidRootPart.CFrame.p + Vector3.new(0, -1e8, 0)
+                        )
+                        task.wait(1)
+                        tool.Parent = plr.Backpack
+                        task.wait(30)
+                        if not anvilEnabled then break end
+                        tool.Parent = plr.Character
+                        task.wait(0.1)
+                        tool:Activate()
+                    end
+                end
+            end
+        end
+    end
+end
+
 local t20 = Tools:AddToggle("AutoThrow", false, 
     function(state) 
+        anvilEnabled = state
+        if state then
+            if not plr.Character:FindFirstChild("Anvil") then
+                activateAnvil()
+            end
+        end
     end, 
     "AutoThrows Anvil")
+
+anvilConnection = plr.CharacterAdded:Connect(function()
+    if anvilEnabled and not plr.Character:FindFirstChild("Anvil") then
+        activateAnvil()
+    end
+end)
+
+if plr.Character then
+    if anvilEnabled and not plr.Character:FindFirstChild("Anvil") then
+        activateAnvil()
+    end
+end
 
 local b3 = Tools:AddButton("ClearSelected", 
     function() 
