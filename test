@@ -5,15 +5,16 @@ end
 
 local plrs = game:GetService("Players")
 local plr = plrs.LocalPlayer
+
 local LoopFlingV1 = {}
 local LoopFlingV2 = {}
 
 local function findplr(Target)
-    local player = game:GetService("Players"):FindFirstChild(Target)
+    local player = plrs:FindFirstChild(Target)
     if player then
         return player
     else
-        for _,v in pairs(game:GetService('Players'):GetPlayers()) do
+        for _, v in pairs(plrs:GetPlayers()) do
             if v.Name:lower():sub(1, #Target) == Target:lower() or v.DisplayName:lower():sub(1, #Target) == Target:lower() then
                 return v
             end
@@ -21,8 +22,6 @@ local function findplr(Target)
     end
     return nil
 end
-
-
 
 local GUI = Instance.new("ScreenGui")
 local Container = Instance.new("Frame")
@@ -344,10 +343,10 @@ local t9 = Main:AddToggle("HiddenFIing", false,
     end, 
     "Makes your FIing/LoopFIing better")
 
-local f1_box = Main:AddBox('Fling Player', Main, 'Fling Player')
-f1_box.FocusLost:Connect(function()
+local x1 = Main:AddBox("FIing", "FIings Target")
+x1.FocusLost:Connect(function()
     pcall(function()
-        local tar = findplr(f1_box.Text)
+        local tar = findplr(x1.Text)
         local accs = tar.Character:FindFirstChildOfClass('Accessory')
         if accs then
             if accs:FindFirstChild('Handle') then
@@ -367,41 +366,52 @@ f1_box.FocusLost:Connect(function()
             plr.Character.PuttingDown:FireServer()
         end
     end)
-    f1_box.Text = ''
+    x1.Text = 'FIings Target'
 end)
 
-local lf1_box = Main:AddBox('Loop Fling', Main, 'Loop fling player')
-lf1_box.FocusLost:Connect(function()
-    local tar = findplr(lf1_box.Text)
+local x2 = Main:AddBox("FIingV2", "FIingsV2 Target")
+x2.FocusLost:Connect(function()
+    pcall(function()
+        local tar = findplr(x2.Text)
+        local accs = tar.Character:FindFirstChildOfClass('Accessory')
+        if accs then
+            if accs:FindFirstChild('Handle') then
+                plr.Character.Picking:FireServer(accs.Handle, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+                wait(0.1)
+            elseif accs:IsA('BasePart') then
+                plr.Character.Picking:FireServer(accs, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+                wait(0.1)
+            end
+        else
+            plr.Character.Picking:FireServer(tar.Character.HumanoidRootPart, Vector3.new(9e37, -9e37, 9e37))
+            wait(0.1)
+        end
+    end)
+    x2.Text = 'FIingsV2 Target'
+end)
+
+local x3 = Main:AddBox("LoopFIings", "LoopFIings Target")
+x3.FocusLost:Connect(function()
+    local tar = findplr(x3.Text)
     if tar and not LoopFlingV1[tar.Name] then
         LoopFlingV1[tar.Name] = tar
     end
-    lf1_box.Text = ''
+    x3.Text = 'LoopFIings Target'
 end)
 
-local f2_box = Main:AddBox('Fling v2', Main, 'Fling player')
-f2_box.FocusLost:Connect(function()
-    pcall(function()
-        findplr(f2_box.Text).Character.ArmAngleChange:FireServer(CFrame.new(math.huge, math.huge, math.huge))
-    end)
-    f2_box.Text = ''
-end)
-
-local lf2_box = Main:AddBox('Loop Fling v2', Main, 'Loop fling player')
-lf2_box.FocusLost:Connect(function()
-    local tar = findplr(lf2_box.Text)
+local x4 = Main:AddBox("LoopFIingV2", "LoopFIingsV2 Target")
+x4.FocusLost:Connect(function()
+    local tar = findplr(x4.Text)
     if tar and not LoopFlingV2[tar.Name] then
         LoopFlingV2[tar.Name] = tar
     end
-    lf2_box.Text = ''
+    x4.Text = 'LoopFIingsV2 Target'
 end)
 
-local b1 = Main:AddButton("ClearLoop", 
-    function()
+local b1 = Main:AddButton("ClearLoop", function()
     LoopFlingV1 = {}
     LoopFlingV2 = {}
-    end, 
-    "Clears LoopFIings/FIings")
+end, "Clears LoopFIings/FIings")
 
 spawn(function()
     while true do
@@ -419,6 +429,8 @@ spawn(function()
                     else
                         plr.Character.Picking:FireServer(v.Character.HumanoidRootPart, Vector3.new(9e37, -9e37, 9e37))
                     end
+                    wait(0.1)
+                    plr.Character.PuttingDown:FireServer()
                 end)
             end
         end
@@ -456,6 +468,39 @@ local t11 = Main:AddToggle("NoClip", false,
 
 local x5 = Main:AddBox("SpinFIing", "SpinFIings Target")
 x5.FocusLost:Connect(function()
+    local target = findplr(x5.Text)
+    if target and target.Character then
+        local targetTorso = target.Character:FindFirstChild("HumanoidRootPart")
+        if targetTorso then
+            plr.Character:SetPrimaryPartCFrame(targetTorso.CFrame)
+            local gyro = Instance.new("BodyGyro", plr.Character.HumanoidRootPart)
+            gyro.MaxTorque = Vector3.new(400000, 400000, 400000)
+            gyro.CFrame = plr.Character.HumanoidRootPart.CFrame
+            gyro.D = 5000
+            local flingConnection
+            flingConnection = target.Character:WaitForChild("Humanoid").Died:Connect(function()
+                gyro:Destroy()
+                pcall(function()
+                    local accs = target.Character:FindFirstChildOfClass("Accessory")
+                    if accs then
+                        if accs:FindFirstChild("Handle") then
+                            plr.Character.Picking:FireServer(accs.Handle, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+                            wait(0.1)
+                            plr.Character.PuttingDown:FireServer()
+                        elseif accs:IsA("BasePart") then
+                            plr.Character.Picking:FireServer(accs, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+                            wait(0.1)
+                            plr.Character.PuttingDown:FireServer()
+                        end
+                    else
+                        plr.Character.Picking:FireServer(target.Character.HumanoidRootPart, Vector3.new(9e37, -9e37, 9e37))
+                        wait(0.1)
+                        plr.Character.PuttingDown:FireServer()
+                    end
+                end)
+            end)
+        end
+    end
 end)
 
 local t12 = Main:AddToggle("AutoPunch", false, 
