@@ -3,6 +3,32 @@ if FGUI then
     FGUI:Destroy()
 end
 
+local plrs = game:GetService'Players'
+local plr = plrs.LocalPlayer
+local ILoopFlingV1 = {}
+local ILoopFlingV2 = {}
+local HiddenFIingEnabled = false
+
+local function findplr(Target)
+    if game:GetService'Players':FindFirstChild(Target) then
+        return game:GetService'Players':FindFirstChild(Target)
+    else
+        if Target ~= nil and Target ~= "" and Target ~= " " and Target then
+            local name = Target
+            local found = false
+            for _,v in pairs(game:GetService'Players':GetPlayers()) do 
+                if not found and (v.Name:lower():sub(1,#name) == name:lower() or v.DisplayName:lower():sub(1,#name) == name:lower()) then
+                    name = v
+                    found = true
+                end
+            end
+            if name ~= nil and name ~= Target then
+                return name
+            end
+        end
+    end
+end
+
 local GUI = Instance.new("ScreenGui")
 local Container = Instance.new("Frame")
 local lbl = Instance.new("TextLabel")
@@ -320,29 +346,95 @@ local t8 = Main:AddToggle("NoRagdollCD", false,
 
 local t9 = Main:AddToggle("HiddenFIing", false, 
     function(state) 
+        HiddenFIingEnabled = state
     end, 
     "Makes your FIing/LoopFIing better")
 
-local x1 = Main:AddBox("FIing", "FIings Target")
-x1.FocusLost:Connect(function()
+local f1_box = Main:AddBox('Fling Player', "Fling Player")
+f1_box.FocusLost:Connect(function()
+    pcall(function()
+        local target = findplr(f1_box.Text)
+        local accs = target.Character:FindFirstChildOfClass'Accessory'
+        if accs then
+            if accs:FindFirstChild'Handle' then
+                plr.Character.Picking:FireServer(accs.Handle, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+            elseif accs:IsA'BasePart' then
+                plr.Character.Picking:FireServer(accs, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+            end
+            wait(0.1)
+            plr.Character.PuttingDown:FireServer()
+        else
+            plr.Character.Picking:FireServer(target.Character.HumanoidRootPart, Vector3.new(9e37, -9e37, 9e37))
+            wait(0.1)  
+            plr.Character.PuttingDown:FireServer()
+        end
+    end)
+    f1_box.Text = 'Fling Player'
 end)
 
-local x2 = Main:AddBox("FIingV2", "FIingsV2 Target")
-x2.FocusLost:Connect(function()
+local If1_box = Main:AddBox('Loop Fling', "Loop fling player")
+If1_box.FocusLost:Connect(function()
+    local target = findplr(If1_box.Text)
+    if target and not ILoopFlingV1[target.Name] then
+        ILoopFlingV1[target.Name] = target
+    end
+    If1_box.Text = 'Loop Fling'
 end)
 
-local x3 = Main:AddBox("LoopFIings", "LoopFIings Target")
-x3.FocusLost:Connect(function()
+local f2_box = Main:AddBox('Fling v2', "Fling player")
+f2_box.FocusLost:Connect(function()
+    pcall(function()
+        local cframeValue = HiddenFIingEnabled and CFrame.new(math.random(-999, math.huge), math.random(-999, math.huge), math.random(-999, math.huge)) or CFrame.new(-9e38, -999, -9e38)
+        findplr(f2_box.Text).Character.ArmAngleChange:FireServer(cframeValue)
+    end)
+    f2_box.Text = 'Fling v2'
 end)
 
-local x4 = Main:AddBox("LoopFIingV2", "LoopFIingsV2 Target")
-x4.FocusLost:Connect(function()
+local If2_box = Main:AddBox('Loop Fling v2', "Loop fling player")
+If2_box.FocusLost:Connect(function()
+    local target = findplr(If2_box.Text)
+    if target and not ILoopFlingV2[target.Name] then
+        ILoopFlingV2[target.Name] = target
+    end
+    If2_box.Text = 'Loop Fling v2'
 end)
 
-local b1 = Main:AddButton("ClearLoop", 
+local clearLF = Main:AddButton("Clear LoopFling", 
     function() 
+        ILoopFlingV1 = {}
+        ILoopFlingV2 = {}
     end, 
-    "Clears LoopFIings/FIings")
+    "Stop loop fling"
+)
+
+spawn(function()
+    while true do
+        wait(0.1)
+        if next(ILoopFlingV1) then
+            for _, v in pairs(ILoopFlingV1) do
+                if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                    pcall(function()
+                        local cframeValue = HiddenFIingEnabled and CFrame.new(math.random(-999, math.huge), math.random(-999, math.huge), math.random(-999, math.huge)) or CFrame.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37)
+                        plr.Character.Picking:FireServer(v.Character.HumanoidRootPart, cframeValue)
+                        wait(0.1)
+                        plr.Character.PuttingDown:FireServer()
+                    end)
+                end
+            end
+        end
+
+        if next(ILoopFlingV2) then
+            for _, v in pairs(ILoopFlingV2) do
+                if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                    pcall(function()
+                        local cframeValue = HiddenFIingEnabled and CFrame.new(math.random(-999, math.huge), math.random(-999, math.huge), math.random(-999, math.huge)) or CFrame.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37)
+                        v.Character.ArmAngleChange:FireServer(cframeValue)
+                    end)
+                end
+            end
+        end
+    end
+end)
 
 local t10 = Main:AddToggle("InfinitePunch", false, 
     function(state) 
