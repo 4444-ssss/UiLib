@@ -1,4 +1,4 @@
-local message = "SAASDASDASD!" -- Message to display
+local message = "xo!" -- Message to display
 local duration = 3 -- Duration in seconds
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
@@ -383,18 +383,8 @@ local x2 = Main:AddBox("FIingV2", "FIingsV2 Target")
 x2.FocusLost:Connect(function()
     pcall(function()
         local tar = findplr(x2.Text)
-        local accs = tar.Character:FindFirstChildOfClass('Accessory')
-        if accs then
-            if accs:FindFirstChild('Handle') then
-                plr.Character.Picking:FireServer(accs.Handle, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
-                wait(0.1)
-            elseif accs:IsA('BasePart') then
-                plr.Character.Picking:FireServer(accs, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
-                wait(0.1)
-            end
-        else
-            plr.Character.Picking:FireServer(tar.Character.HumanoidRootPart, Vector3.new(9e37, -9e37, 9e37))
-            wait(0.1)
+        if tar and tar.Character then
+            tar.Character.ArmAngleChange:FireServer(CFrame.new(-9e38, -999, -8.974392464e38))
         end
     end)
     x2.Text = ''
@@ -466,15 +456,55 @@ game:GetService('Players').PlayerAdded:Connect(function(player)
     end)
 end)
 
+local punch_anim = Instance.new('Animation')
+punch_anim.Name = 'FakePunch'
+punch_anim.AnimationId = 'rbxassetid://5193683418'
+
 local t10 = Main:AddToggle("InfinitePunch", false, 
     function(state) 
     end, 
     "Gives InfinitePunch (E)")
 
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+    if input.KeyCode == Enum.KeyCode.E and t10:GetState() then
+        pcall(function()
+            plr.Character.Humanoid:LoadAnimation(punch_anim):Play()
+        end)
+    end
+end)
+
 local t11 = Main:AddToggle("NoClip", false, 
     function(state) 
+        if state then
+            enableNoClip()
+        else
+            disableNoClip()
+        end
     end, 
     "Gives you NoClip")
+
+local function enableNoClip()
+    local character = plr.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end
+
+local function disableNoClip()
+    local character = plr.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = true
+            end
+        end
+    end
+end
 
 local x5 = Main:AddBox("SpinFIing", "SpinFIings Target")
 x5.FocusLost:Connect(function()
@@ -497,8 +527,39 @@ local t14 = Main:AddToggle("Virus", false,
 
 local b2 = Main:AddButton("PermaGod", 
     function() 
+        local function giveGodMode()
+
+            pcall(function()
+                for _, v in next, plr.Character:GetChildren() do
+                    if v.Name == 'VelocityDamage' or v.Name == 'GetPicked' or v.Name == 'ArmAngleUpdate' then
+                        v:Destroy()
+                    end
+                end
+            end)
+            pcall(function()
+                local hum = plr.Character.Humanoid
+                local cl = hum:Clone()
+                cl.Parent = plr.Character
+                hum.Parent = nil
+                cl:GetPropertyChangedSignal('Health'):Connect(function()
+                    if cl.Health <= 0 then
+                        hum.Parent = plr.Character
+                        wait(1)
+                        hum:Destroy()
+                    end
+                end)
+                workspace.CurrentCamera.CameraSubject = plr.Character
+            end)
+        end
+
+        giveGodMode()
+
+        plr.CharacterAdded:Connect(function()
+            repeat wait() until plr.Character:FindFirstChild('Humanoid')
+            giveGodMode()
+        end)
     end, 
-    "Gives PermaGod")
+    "Gives PermaGod (Auto-gives if respawned)")
 
 local Tools = Lib.AddPage("Tools", "Show's Tools Tab")
 
