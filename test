@@ -15,8 +15,7 @@ local str = Instance.new("UIStroke")
 
 GUI.Name = "GUI"
 GUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-GUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-GUI.ResetOnSpawn = false
+GUI.ResetOnSpawn = false  -- Prevent GUI from being reset on player respawn
 
 Container.Name = "Container"
 Container.Parent = GUI
