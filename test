@@ -370,7 +370,7 @@ f1_box.FocusLost:Connect(function()
             plr.Character.PuttingDown:FireServer()
         end
     end)
-    f1_box.Text = 'Fling Player'
+    f1_box.Text = ''
 end)
 
 local If1_box = Main:AddBox('Loop Fling', "Loop fling player")
@@ -379,7 +379,7 @@ If1_box.FocusLost:Connect(function()
     if target and not ILoopFlingV1[target.Name] then
         ILoopFlingV1[target.Name] = target
     end
-    If1_box.Text = 'Loop Fling'
+    If1_box.Text = ''
 end)
 
 local f2_box = Main:AddBox('Fling v2', "Fling player")
@@ -393,7 +393,7 @@ f2_box.FocusLost:Connect(function()
         end
         findplr(f2_box.Text).Character.ArmAngleChange:FireServer(cframeValue)
     end)
-    f2_box.Text = 'Fling v2'
+    f2_box.Text = ''
 end)
 
 local If2_box = Main:AddBox('Loop Fling v2', "Loop fling player")
@@ -402,7 +402,7 @@ If2_box.FocusLost:Connect(function()
     if target and not ILoopFlingV2[target.Name] then
         ILoopFlingV2[target.Name] = target
     end
-    If2_box.Text = 'Loop Fling v2'
+    If2_box.Text = ''
 end)
 
 local clearLF = Main:AddButton("Clear LoopFling", 
@@ -413,49 +413,83 @@ local clearLF = Main:AddButton("Clear LoopFling",
     "Stop loop fling"
 )
 
+-- New function to handle player rejoin
+local function onPlayerAdded(player)
+    -- Make sure we add the player back if they leave and rejoin
+    if ILoopFlingV1[player.Name] then
+        ILoopFlingV1[player.Name] = player
+    end
+    if ILoopFlingV2[player.Name] then
+        ILoopFlingV2[player.Name] = player
+    end
+end
+
+game:GetService("Players").PlayerAdded:Connect(onPlayerAdded)
+
 spawn(function()
     while true do
         wait(0.1)
-        if next(ILoopFlingV1) then
-            for _, v in pairs(ILoopFlingV1) do
-                if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-                    pcall(function()
-                        local cframeValue
-                        if HiddenFIingEnabled then
-                            cframeValue = CFrame.new(math.random(-999, math.huge), -999, math.random(-999, math.huge))
-                        else
-                            cframeValue = CFrame.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37)
-                        end
-                        plr.Character.Picking:FireServer(v.Character.HumanoidRootPart, cframeValue)
-                        wait(0.1)
-                        plr.Character.PuttingDown:FireServer()
-                    end)
-                end
+
+        -- Loop through targets in ILoopFlingV1
+        for _, v in pairs(ILoopFlingV1) do
+            if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                pcall(function()
+                    local cframeValue
+                    if HiddenFIingEnabled then
+                        cframeValue = CFrame.new(math.random(-999, math.huge), -999, math.random(-999, math.huge))
+                    else
+                        cframeValue = CFrame.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37)
+                    end
+                    plr.Character.Picking:FireServer(v.Character.HumanoidRootPart, cframeValue)
+                    wait(0.1)
+                    plr.Character.PuttingDown:FireServer()
+                end)
             end
         end
 
-        if next(ILoopFlingV2) then
-            for _, v in pairs(ILoopFlingV2) do
-                if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-                    pcall(function()
-                        local cframeValue
-                        if HiddenFIingEnabled then
-                            cframeValue = CFrame.new(math.random(-999, math.huge), -999, math.random(-999, math.huge))
-                        else
-                            cframeValue = CFrame.new(8.99999981e+37, -999, 8.99999981e+37)
-                        end
-                        v.Character.ArmAngleChange:FireServer(cframeValue)
-                    end)
-                end
+        -- Loop through targets in ILoopFlingV2
+        for _, v in pairs(ILoopFlingV2) do
+            if v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                pcall(function()
+                    local cframeValue
+                    if HiddenFIingEnabled then
+                        cframeValue = CFrame.new(math.random(-999, math.huge), -999, math.random(-999, math.huge))
+                    else
+                        cframeValue = CFrame.new(8.99999981e+37, -999, 8.99999981e+37)
+                    end
+                    v.Character.ArmAngleChange:FireServer(cframeValue)
+                end)
             end
         end
     end
 end)
 
+local InfinitePunchEnabled = false
 local t10 = Main:AddToggle("InfinitePunch", false, 
     function(state) 
+        InfinitePunchEnabled = state
     end, 
     "Gives InfinitePunch (E)")
+
+local punch_anim = Instance.new('Animation')
+punch_anim.Name = 'FakePunch'
+punch_anim.AnimationId = 'rbxassetid://5193683418'
+
+local function playPunchAnimation()
+    if InfinitePunchEnabled then
+        local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid:LoadAnimation(punch_anim):Play()
+        end
+    end
+end
+
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+    if input.KeyCode == Enum.KeyCode.E then
+        playPunchAnimation()
+    end
+end)
 
 local t11 = Main:AddToggle("NoClip", false, 
     function(state) 
@@ -468,10 +502,24 @@ x5.FocusLost:Connect(function()
     if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid") then
         if not SpinFlingActive[targetPlayer.Name] then
             SpinFlingActive[targetPlayer.Name] = true
+            
             local targetHumanoidRootPart = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
             if targetHumanoidRootPart then
+                local originalPosition = plr.Character.HumanoidRootPart.Position
                 plr.Character.HumanoidRootPart.CFrame = targetHumanoidRootPart.CFrame * CFrame.new(0, 0, 0)
-                targetPlayer.Character.HumanoidRootPart.CFrame = targetHumanoidRootPart.CFrame * CFrame.Angles(0, math.random(-999, math.huge), 0)
+                
+                repeat
+                    wait(0.1)
+                    targetPlayer.Character.HumanoidRootPart.CFrame = targetHumanoidRootPart.CFrame * CFrame.Angles(0, math.random(-999, math.huge), 0)
+                until (targetPlayer.Character.HumanoidRootPart.Position - targetHumanoidRootPart.Position).magnitude > 100
+                
+                plr.Character.HumanoidRootPart.CFrame = CFrame.new(originalPosition)
+                
+                pcall(function()
+                    plr.Character.Picking:FireServer(targetPlayer.Character.HumanoidRootPart, targetPlayer.Character.HumanoidRootPart.Position)
+                    wait(0.1)
+                    plr.Character.PuttingDown:FireServer()
+                end)
             end
             SpinFlingActive[targetPlayer.Name] = false
         end
