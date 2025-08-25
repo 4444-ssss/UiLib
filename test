@@ -15,7 +15,8 @@ local str = Instance.new("UIStroke")
 
 GUI.Name = "GUI"
 GUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-GUI.ResetOnSpawn = false  -- Prevent GUI from being reset on player respawn
+GUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+GUI.ResetOnSpawn = false
 
 Container.Name = "Container"
 Container.Parent = GUI
@@ -255,19 +256,15 @@ function Lib.AddPage(name, hovertip)
         UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
         local baseText = lbl.Text
+
         Box.MouseEnter:Connect(function()
             lbl.Text = hovertipText or ("Input: " .. (Box.Text == "" and "(empty)" or Box.Text))
         end)
+
         Box.MouseLeave:Connect(function()
             lbl.Text = baseText
         end)
 
-        return Box
-    end
-            typeIntoLabel(hovertipText or ("Input: " .. (Box.Text == "" and "(empty)" or Box.Text)))
-        end)
-
-        bindHover(Box, hovertipText or "")
         return Box
     end
 
@@ -275,8 +272,6 @@ function Lib.AddPage(name, hovertip)
     if not currentPage then switchTo(name) end
     return pageApi
 end
-
-return Lib
 
 local Main = Lib.AddPage("Main", "Show's Main Tab")
 
