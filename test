@@ -1,3 +1,12 @@
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Game Notification", -- Title of the notification
+    Text = "This is a simple game notification!", -- The message displayed
+    Icon = "rbxassetid://1234567890", -- (Optional) Icon for the notification, you can replace it with any asset ID
+    Duration = 5 -- How long the notification will last (in seconds)
+})
+
+
+
 local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("GUI")
 if FGUI then
     FGUI:Destroy()
@@ -5,9 +14,12 @@ end
 
 local plrs = game:GetService("Players")
 local plr = plrs.LocalPlayer
-
+local character = plr.Character or plr.CharacterAdded:Wait()
 local LoopFlingV1 = {}
 local LoopFlingV2 = {}
+local antiFlingEnabled = false
+local antiFlingConn
+local prop1000 = PhysicalProperties.new(1000,1000,0,1000,0)
 
 local function findplr(Target)
     local player = plrs:FindFirstChild(Target)
@@ -22,6 +34,86 @@ local function findplr(Target)
     end
     return nil
 end
+
+
+local function gw(o)
+    return o:FindFirstChild("ConnectedWeld")
+end
+
+local function ic(w)
+    return w and w.Part1 and w.Part1:IsDescendantOf(plr.Character)
+end
+
+local function d(o)
+    local w = gw(o)
+    if ic(w) then
+        o:Destroy()
+    end
+end
+
+workspace.DescendantAdded:Connect(function(o)
+    if antiFlingEnabled and o.Name == "Stabler" then
+        task.spawn(function()
+            if gw(o) or o:WaitForChild("ConnectedWeld", 10) then
+                d(o)
+            end
+        end)
+    end
+end)
+
+local function mp(p)
+    return p:IsA("BasePart") and p.Name ~= "HumanoidRootPart"
+end
+
+local function mm(p)
+    p.Massless = true
+end
+
+local function ma(character)
+    for _, v in ipairs(character:GetDescendants()) do
+        if mp(v) then
+            mm(v)
+        end
+    end
+end
+
+local function sa(character)
+    local e = character:FindFirstChild("ArmAngleChange")
+    if e then
+        e:FireServer()
+    end
+end
+
+local function loop()
+    while character and plr.Character == character do
+        if antiFlingEnabled then
+            ma(character)
+            sa(character)
+        end
+        task.wait(0.2)
+    end
+end
+
+plr.CharacterAdded:Connect(function(nc)
+    character = nc
+    if antiFlingConn then antiFlingConn:Disconnect() end
+    antiFlingConn = task.spawn(loop)
+end)
+
+task.spawn(loop)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 local GUI = Instance.new("ScreenGui")
 local Container = Instance.new("Frame")
@@ -298,25 +390,113 @@ end
 
 local Main = Lib.AddPage("Main", "Show's Main Tab")
 
-local t1 = Main:AddToggle("AntiFIing", false, 
-    function(state) 
-    end, 
-    "Prevents from getting Flung")
+Main:AddToggle("AntiFling", false, function(state)
+    antiFlingEnabled = state
+    if not antiFlingEnabled and antiFlingConn then
+        antiFlingConn:Disconnect()
+    else
+        if not antiFlingConn then
+            antiFlingConn = task.spawn(loop)
+        end
+    end
+end, "Prevents from getting Flung")
 
 local t2 = Main:AddToggle("AntiRagdoll", false, 
     function(state) 
+        if state then
+            enableAntiRagdoll()
+        else
+            disableAntiRagdoll()
+        end
     end, 
     "Prevents from Ragdolling")
 
+local antiRagdollConnection
+
+local function enableAntiRagdoll()
+    antiRagdollConnection = game:GetService("RunService").Heartbeat:Connect(function()
+        if plr.Character and plr.Character:FindFirstChild("Ragdoll") and plr.Character.Ragdoll.Value then
+            plr.Character.GetUpEvent:FireServer()
+        end
+    end)
+end
+
+local function disableAntiRagdoll()
+    if antiRagdollConnection then
+        antiRagdollConnection:Disconnect()
+        antiRagdollConnection = nil
+    end
+end
+
 local t3 = Main:AddToggle("NoFallDamage", false, 
     function(state) 
+        if state then
+            enableNoFallDamage()
+        else
+            disableNoFallDamage()
+        end
     end, 
     "FallDamage Won't Effect")
 
+local removedParts = {}
+
+local function enableNoFallDamage()
+    for _, v in next, plr.Character:GetChildren() do
+        if v.Name == 'VelocityDamage' or v.Name == 'Stabler' then
+        else
+            table.insert(removedParts, v)
+            v:Destroy()
+        end
+    end
+end
+
+local function disableNoFallDamage()
+    for _, part in next, removedParts do
+        if part.Parent == nil then
+            part.Parent = plr.Character
+        end
+    end
+    removedParts = {}
+end
+
+
 local t4 = Main:AddToggle("AntiSpinner", false, 
     function(state) 
+        if state then
+            enableAntiSpinner()
+        else
+            disableAntiSpinner()
+        end
     end, 
     "Activates/Deactivates AntiSpinner")
+
+local function enableAntiSpinner()
+    for _,v in next,plr.Character:GetChildren() do
+        if v:IsA('BasePart') then
+            v.CustomPhysicalProperties = prop1000
+        end
+    end
+end
+
+local function disableAntiSpinner()
+    for _,v in next,plr.Character:GetDescendants() do
+        if v:IsA('BasePart') then
+            v.CustomPhysicalProperties = PhysicalProperties.new(0.3,0.2,0,0.2,0.2)
+        end
+    end
+end
+
+workspace.DescendantAdded:Connect(function(v)
+    pcall(function()
+        if t4:GetState() and v:IsA('Model') and plrs:GetPlayerFromCharacter(v) and v ~= plr.Character then
+            for _,x in next,v:GetChildren() do
+                if x:IsA('BasePart') then
+                    v.Massless = true
+                end
+            end
+        end
+    end)
+end)
 
 local t5 = Main:AddToggle("AutoRespawn", false, 
     function(state) 
