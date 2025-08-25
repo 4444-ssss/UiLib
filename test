@@ -234,39 +234,42 @@ function Lib.AddPage(name, hovertip)
         return Button
     end
 
-    function pageApi:AddBox(placeholderText, hovertipText)
-        local Box = Instance.new("TextBox")
-        Box.Name = "Box_" .. (placeholderText or "Input")
-        Box.Parent = PageFrame
-        Box.BackgroundColor3 = Color3.fromRGB(21, 21, 21)
-        Box.BackgroundTransparency = 0.2
-        Box.BorderSizePixel = 0
-        Box.Size = UDim2.new(0, 93, 0, 20)
-        Box.Font = Enum.Font.SourceSans
-        Box.PlaceholderColor3 = Color3.fromRGB(65, 65, 65)
-        Box.PlaceholderText = placeholderText or "Box"
-        Box.Text = ""
-        Box.TextColor3 = Color3.fromRGB(107, 107, 107)
-        Box.TextScaled = true
-        Box.TextWrapped = true
+function pageApi:AddBox(placeholderText, hovertipText)
+    local Box = Instance.new("TextBox")
+    Box.Name = "Box_" .. (placeholderText or "Input")
+    Box.Parent = PageFrame
+    Box.BackgroundColor3 = Color3.fromRGB(21, 21, 21)
+    Box.BackgroundTransparency = 0.2
+    Box.BorderSizePixel = 0
+    Box.Size = UDim2.new(0, 93, 0, 20)
+    Box.Font = Enum.Font.SourceSans
+    Box.PlaceholderColor3 = Color3.fromRGB(65, 65, 65)
+    Box.PlaceholderText = placeholderText or "Box"
+    Box.Text = ""
+    Box.TextColor3 = Color3.fromRGB(107, 107, 107)
+    Box.TextScaled = true
+    Box.TextWrapped = true
 
-        local UIStroke = Instance.new("UIStroke")
-        UIStroke.Parent = Box
-        UIStroke.Color = Color3.fromRGB(43, 43, 43)
-        UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    local UIStroke = Instance.new("UIStroke")
+    UIStroke.Parent = Box
+    UIStroke.Color = Color3.fromRGB(43, 43, 43)
+    UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-        local baseText = lbl.Text
+    local baseText = lbl.Text
 
-        Box.MouseEnter:Connect(function()
-            lbl.Text = hovertipText or ("Input: " .. (Box.Text == "" and "(empty)" or Box.Text))
-        end)
+    Box.MouseEnter:Connect(function()
+        -- Animate hover tip text
+        local hoverText = hovertipText or ("Input: " .. (Box.Text == "" and "(empty)" or Box.Text))
+        typeIntoLabel(hoverText)
+    end)
 
-        Box.MouseLeave:Connect(function()
-            lbl.Text = baseText
-        end)
+    Box.MouseLeave:Connect(function()
 
-        return Box
-    end
+        typeIntoLabel(baseText)
+    end)
+
+    return Box
+end
 
     pages[name] = pageApi
     if not currentPage then switchTo(name) end
