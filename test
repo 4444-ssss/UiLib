@@ -1,3 +1,4 @@
+
 local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("GUI")
 if FGUI then
     FGUI:Destroy()
@@ -10,7 +11,7 @@ local LoopFlingV2 = {}
 
 local function handleAntiRagdoll(state)
     local ragdoll = plr.Character:FindFirstChild("Ragdoll")
-    
+
     if state then
         if ragdoll then
             ragdoll:Destroy()
@@ -45,19 +46,6 @@ end
 local function randomCFrame()
     return CFrame.new(math.random(-9e38, 9e38), -999, math.random(-9e38, 9e38))
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 -- gui
 local GUI = Instance.new("ScreenGui")
