@@ -111,13 +111,6 @@ function findplr(playerName)
     return nil
 end
 
-
-
-
-
-
-
-
 local GUI = Instance.new("ScreenGui")
 local Container = Instance.new("Frame")
 local lbl = Instance.new("TextLabel")
