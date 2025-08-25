@@ -1,4 +1,3 @@
-
 local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("GUI")
 if FGUI then
     FGUI:Destroy()
@@ -6,48 +5,119 @@ end
 
 local plrs = game:GetService'Players'
 local plr = plrs.LocalPlayer
-local LoopFlingV1 = {}
-local LoopFlingV2 = {}
+local FIing = {}
+local FIingV2 = {}
+local LoopFIing = {}
+local LoopFIingV2 = {}
 
-local function handleAntiRagdoll(state)
-    local ragdoll = plr.Character:FindFirstChild("Ragdoll")
-
-    if state then
-        if ragdoll then
-            ragdoll:Destroy()
-        end
-    else
-        if not ragdoll then
-            return
-        end
+local function addFIing(target)
+    if target and not FIing[target.Name] then
+        FIing[target.Name] = target
     end
 end
 
-local function findplr(Target)
-    if game:GetService'Players':FindFirstChild(Target) then
-        return game:GetService'Players':FindFirstChild(Target)
-    else
-        if Target ~= nil and Target ~= "" and Target ~= " " and Target then
-            local name = Target
-            local found = false
-            for _,v in pairs(game:GetService'Players':GetPlayers()) do 
-                if not found and (v.Name:lower():sub(1,#name) == name:lower() or v.DisplayName:lower():sub(1,#name) == name:lower()) then
-                    name = v
-                    found = true
+local function addFIingV2(target)
+    if target and not FIingV2[target.Name] then
+        FIingV2[target.Name] = target
+    end
+end
+
+local function addLoopFIing(target)
+    if target and not LoopFIing[target.Name] then
+        LoopFIing[target.Name] = target
+    end
+end
+
+local function addLoopFIingV2(target)
+    if target and not LoopFIingV2[target.Name] then
+        LoopFIingV2[target.Name] = target
+    end
+end
+
+spawn(function()
+    while true do
+        wait(0.1)
+        for _, v in next, FIing do
+            pcall(function()
+                if v.Character then
+                    local accs = v.Character:FindFirstChildOfClass('Accessory')
+                    if accs then
+                        if accs:FindFirstChild('Handle') then
+                            plr.Character.Picking:FireServer(accs.Handle, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+                        elseif accs:IsA('BasePart') then
+                            plr.Character.Picking:FireServer(accs, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+                        end
+                        wait(0.1)
+                        plr.Character.PuttingDown:FireServer()
+                    else
+                        plr.Character.Picking:FireServer(v.Character.HumanoidRootPart, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+                        wait(0.1)
+                        plr.Character.PuttingDown:FireServer()
+                    end
                 end
-            end
-            if name ~= nil and name ~= Target then
-                return name
+            end)
+        end
+
+        for _, v in next, FIingV2 do
+            pcall(function()
+                if v.Character then
+                    v.Character.ArmAngleChange:FireServer(CFrame.new(8.99999981e+37, -999, 8.99999981e+37))
+                end
+            end)
+        end
+
+        for _, v in next, LoopFIing do
+            pcall(function()
+                if v.Character then
+                    local accs = v.Character:FindFirstChildOfClass('Accessory')
+                    if accs then
+                        if accs:FindFirstChild('Handle') then
+                            plr.Character.Picking:FireServer(accs.Handle, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+                        elseif accs:IsA('BasePart') then
+                            plr.Character.Picking:FireServer(accs, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+                        end
+                        wait(0.1)
+                        plr.Character.PuttingDown:FireServer()
+                    else
+                        plr.Character.Picking:FireServer(v.Character.HumanoidRootPart, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+                        wait(0.1)
+                        plr.Character.PuttingDown:FireServer()
+                    end
+                end
+            end)
+        end
+
+        for _, v in next, LoopFIingV2 do
+            pcall(function()
+                if v.Character then
+                    v.Character.ArmAngleChange:FireServer(CFrame.new(math.huge, -999, math.huge))
+                end
+            end)
+        end
+    end
+end)
+
+function findplr(playerName)
+    local target = game:GetService("Players"):FindFirstChild(playerName)
+    if target then
+        return target
+    else
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            if player.Name:lower():sub(1, #playerName) == playerName:lower() or player.DisplayName:lower():sub(1, #playerName) == playerName:lower() then
+                return player
             end
         end
     end
+    return nil
 end
 
-local function randomCFrame()
-    return CFrame.new(math.random(-9e38, 9e38), -999, math.random(-9e38, 9e38))
-end
 
--- gui
+
+
+
+
+
+
 local GUI = Instance.new("ScreenGui")
 local Container = Instance.new("Frame")
 local lbl = Instance.new("TextLabel")
@@ -316,66 +386,8 @@ end
 
 local Main = Lib.AddPage("Main", "Show's Main Tab")
 
-local antifling = false
-
 local t1 = Main:AddToggle("AntiFIing", false, 
     function(state) 
-        antifling = state
-        if antifling then
-            local p = game:GetService("Players").LocalPlayer
-            local c = p.Character or p.CharacterAdded:Wait()
-
-            local function gw(o) return o:FindFirstChild("ConnectedWeld") end
-            local function ic(w) return w and w.Part1 and w.Part1:IsDescendantOf(p.Character) end
-            local function d(o) local w = gw(o) if ic(w) then o:Destroy() end end
-
-            local conn
-            conn = workspace.DescendantAdded:Connect(function(o)
-                if o.Name == "Stabler" then
-                    task.spawn(function()
-                        if gw(o) or o:WaitForChild("ConnectedWeld", 10) then d(o) end
-                    end)
-                end
-            end)
-
-            local function mp(p) return p:IsA("BasePart") and p.Name ~= "HumanoidRootPart" end
-            local function mm(p) p.Massless = true end
-            local function ma(c) for _,v in ipairs(c:GetDescendants()) do if mp(v) then mm(v) end end end
-
-            local function ga(c) return c:FindFirstChild("ArmAngleChange") end
-            local function cf()
-                return CFrame.new(0.999999583, 0.650959253, 0.0507530943,
-                0.994099438, 0.0974220186, 0.0476996154,
-                -0.0791255683, 0.952069402, -0.295470744,
-                -0.074198693, 0.289953023, 0.954160273)
-            end
-            local function sa(c) local e = ga(c) if e then e:FireServer(cf()) end end
-
-            local function loop()
-                while c and p.Character == c do
-                    ma(c)
-                    sa(c)
-                    task.wait(0.2)
-                end
-            end
-
-            p.CharacterAdded:Connect(function(nc)
-                c = nc
-                task.spawn(loop)
-            end)
-
-            task.spawn(loop)
-        else
-            antifling = false
-            conn:Disconnect()
-            if c then
-                for _, v in pairs(c:GetDescendants()) do
-                    if v:IsA("BasePart") then
-                        v.Massless = false
-                    end
-                end
-            end
-        end
     end, 
     "Prevents from getting Flung")
 
@@ -391,95 +403,18 @@ end)
 
 local t3 = Main:AddToggle("NoFallDamage", false, 
     function(state) 
-        if state then
-            for _, v in next, plr.Character:GetChildren() do
-                if v.Name == 'VelocityDamage' then
-                    v:Destroy()
-                end
-            end
-        end
     end, 
     "FallDamage Won't Effect")
 
-plr.CharacterAdded:Connect(function(character)
-    if t3:Get() then
-        for _, v in next, character:GetChildren() do
-            if v.Name == 'VelocityDamage' then
-                v:Destroy()
-            end
-        end
-    end
-end)
-
 local t4 = Main:AddToggle("AntiSpinner", false, 
     function(state) 
-        Settings['AntiSpinner'] = state
-        if state then
-            for _,v in next, plr.Character:GetChildren() do
-                if v:IsA("BasePart") then
-                    v.CustomPhysicalProperties = PhysicalProperties.new(1000, 1000, 0, 1000, 0)
-                end
-            end
-
-            local conn
-            conn = workspace.DescendantAdded:Connect(function(v)
-                if Settings['AntiSpinner'] and v:IsA("Model") and plrs:GetPlayerFromCharacter(v) and v ~= plr.Character then
-                    for _,x in next,v:GetChildren() do
-                        if x:IsA("BasePart") then
-                            x.CustomPhysicalProperties = PhysicalProperties.new(1000, 1000, 0, 1000, 0)
-                        end
-                    end
-                end
-            end)
-        else
-            for _,v in next, plr.Character:GetDescendants() do
-                pcall(function()
-                    if v:IsA('BasePart') then
-                        v.CustomPhysicalProperties = PhysicalProperties.new(0.3, 0.2, 0, 0.2, 0.2)
-                    end
-                end)
-            end
-        end
     end, 
     "Activates/Deactivates AntiSpinner")
 
 local t5 = Main:AddToggle("AutoRespawn", false, 
     function(state) 
-        Settings['AutoRespawn'] = state
-        if state then
-            plr.CharacterAdded:Connect(function()
-                if Settings['AutoRespawn'] then
-                    local humanoid = plr.Character:WaitForChild("Humanoid")
-                    humanoid.HealthChanged:Connect(function()
-                        if humanoid.Health == 0 then
-                            wait(1)
-                            respawn()
-                        end
-                    end)
-                end
-            end)
-        end
     end, 
-    "Activates/Deactivates AutoRespawn")
-
-local function respawn()
-    pcall(function()
-        local b = plr.PlayerGui.DeathMenu.Frame.Button.TextButton
-        b.Position = UDim2.new(0,0,0,0)
-        b.Size = UDim2.new(1,0,1,0)
-        b.Text = ''
-        b.BackgroundTransparency = 1
-        b.ZIndex = (2^31-1)
-        local s = Instance.new('ScreenGui',game:GetService('CoreGui'))
-        b.Parent = s
-        vim:SendMouseButtonEvent(b.AbsolutePosition.X + b.AbsoluteSize.X / 2, b.AbsolutePosition.Y + b.AbsoluteSize.Y / 2, 0, true, game, 0)
-        vim:SendMouseButtonEvent(b.AbsolutePosition.X + b.AbsoluteSize.X / 2, b.AbsolutePosition.Y + b.AbsoluteSize.Y / 2, 0, false, game, 0)
-        spawn(function()
-            wait()
-            s:Destroy()
-        end)
-    end)
-end
+    "AutoRespawns By its own")
 
 local t6 = Main:AddToggle("MovementHack", false, 
     function(state) 
@@ -488,15 +423,8 @@ local t6 = Main:AddToggle("MovementHack", false,
 
 local t7 = Main:AddToggle("AntiVoid", false, 
     function(state) 
-        Settings['AntiVoid'] = state
-        if state then
-            game.FallenPartsDestroyHeight = math.huge
-        else
-            game.FallenPartsDestroyHeight = 0
-        end
     end, 
     "Prevents from Dying when fall to void")
-
 
 local t8 = Main:AddToggle("NoRagdollCD", false, 
     function(state) 
@@ -508,78 +436,57 @@ local t9 = Main:AddToggle("HiddenFIing", false,
     end, 
     "Makes your FIing/LoopFIing better")
 
-local x1 = Main:AddBox("FIing", 
-    function(text, enter) 
+local f1_box = addBox('FIing', Main, 'Fling player')
+f1_box.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
         pcall(function()
-            local target = findplr(text)
-            if target then
-                target.Character:FindFirstChild("ArmAngleChange"):FireServer(randomCFrame())
-                LoopFlingV1[target.Name] = target
+            local tar = findplr(f1_box.Text)
+            if tar then
+                addFIing(tar)
             end
         end)
-    end, 
-    "FIings Target")
+        f1_box.Text = ''
+    end
+end)
 
-local x2 = Main:AddBox("FIingV2", 
-    function(text, enter) 
+local f2_box = addBox('FIing v2', Main, 'Fling player')
+f2_box.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
         pcall(function()
-            local target = findplr(text)
-            if target then
-                target.Character:FindFirstChild("ArmAngleChange"):FireServer(randomCFrame())
-                LoopFlingV2[target.Name] = target
+            local tar = findplr(f2_box.Text)
+            if tar then
+                addFIingV2(tar)
             end
         end)
-    end, 
-    "FIingsV2 Target")
+        f2_box.Text = ''
+    end
+end)
 
-local x3 = Main:AddBox("LoopFIing", 
-    function(text, enter) 
-        pcall(function()
-            local target = findplr(text)
-            if target then
-                LoopFlingV1[target.Name] = target
-            end
-        end)
-    end, 
-    "LoopFIings Target")
-
-local x4 = Main:AddBox("LoopFIingV2", 
-    function(text, enter) 
-        pcall(function()
-            local target = findplr(text)
-            if target then
-                LoopFlingV2[target.Name] = target
-            end
-        end)
-    end, 
-    "LoopFIingsV2 Target")
-
-local b1 = Main:AddButton("ClearLoop", 
-    function() 
-        LoopFlingV1 = {}
-        LoopFlingV2 = {}
-    end, 
-    "Clears LoopFIings/FIings")
-
-game:GetService("Players").PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function(character)
-        if LoopFlingV1[player.Name] then
-            task.spawn(function()
-                repeat
-                    wait(0.1)
-                    player.Character:FindFirstChild("ArmAngleChange"):FireServer(randomCFrame())
-                until not LoopFlingV1[player.Name] or not player.Character or not player.Character.Parent
-            end)
+local lf1_box = addBox('Loop FIing', Main, 'Loop fling player')
+lf1_box.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local tar = findplr(lf1_box.Text)
+        if tar then
+            addLoopFIing(tar)
         end
-        if LoopFlingV2[player.Name] then
-            task.spawn(function()
-                repeat
-                    wait(0.1)
-                    player.Character.ArmAngleChange:FireServer(randomCFrame())
-                until not LoopFlingV2[player.Name] or not player.Character or not player.Character.Parent
-            end)
+        lf1_box.Text = ''
+    end
+end)
+
+local lf2_box = addBox('Loop FIing v2', Main, 'Loop fling player')
+lf2_box.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local tar = findplr(lf2_box.Text)
+        if tar then
+            addLoopFIingV2(tar)
         end
-    end)
+        lf2_box.Text = ''
+    end
+end)
+
+addButton('Clear LoopFling', Main, 'Stop loop fling').MouseButton1Down:Connect(function()
+    LoopFIing = {}
+    LoopFIingV2 = {}
 end)
 
 local t10 = Main:AddToggle("InfinitePunch", false, 
