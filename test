@@ -454,59 +454,13 @@ end)
 
 local t10 = Main:AddToggle("InfinitePunch", false, 
     function(state) 
-        if state then
-            local punch_anim = Instance.new('Animation')
-            punch_anim.Name = 'FakePunch'
-            punch_anim.AnimationId = 'rbxassetid://5193683418'
-            local humanoid = plr.Character:FindFirstChildOfClass('Humanoid')
-            if humanoid then
-                local animTrack = humanoid:LoadAnimation(punch_anim)
-                animTrack:Play()
-            end
-        end
     end, 
-    "Gives InfinitePunch (E)"
-)
-
-mouse.KeyDown:Connect(function(key)
-    if key == 'e' and t10.State then
-        local punch_anim = Instance.new('Animation')
-        punch_anim.Name = 'FakePunch'
-        punch_anim.AnimationId = 'rbxassetid://5193683418'
-        local humanoid = plr.Character:FindFirstChildOfClass('Humanoid')
-        if humanoid then
-            local animTrack = humanoid:LoadAnimation(punch_anim)
-            animTrack:Play()
-        end
-    end
-end)
+    "Gives InfinitePunch (E)")
 
 local t11 = Main:AddToggle("NoClip", false, 
     function(state) 
-        if state then
-            local character = plr.Character
-            if character then
-                character.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-                for _, part in ipairs(character:GetChildren()) do
-                    if part:IsA('BasePart') then
-                        part.CanCollide = false
-                    end
-                end
-            end
-        else
-            local character = plr.Character
-            if character then
-                character.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-                for _, part in ipairs(character:GetChildren()) do
-                    if part:IsA('BasePart') then
-                        part.CanCollide = true
-                    end
-                end
-            end
-        end
     end, 
-    "Gives you NoClip"
-)
+    "Gives you NoClip")
 
 local x5 = Main:AddBox("SpinFIing", "SpinFIings Target")
 x5.FocusLost:Connect(function()
