@@ -396,10 +396,12 @@ lf2_box.FocusLost:Connect(function()
     lf2_box.Text = ''
 end)
 
-addButton('Clear LoopFling', Main, 'Stop loop fling').MouseButton1Down:Connect(function()
+local b1 = Main:AddButton("ClearLoop", 
+    function()
     LoopFlingV1 = {}
     LoopFlingV2 = {}
-end)
+    end, 
+    "Clears LoopFIings/FIings")
 
 spawn(function()
     while true do
