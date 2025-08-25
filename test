@@ -2,9 +2,11 @@ local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("
 if FGUI then
     FGUI:Destroy()
 end
-
+local rs = game:GetService('RunService')
 local plrs = game:GetService("Players")
 local plr = plrs.LocalPlayer
+local vim = game:GetService('VirtualInputManager')
+local ts = game:GetService('TweenService')
 local LoopFlingV1 = {}
 local LoopFlingV2 = {}
 
@@ -55,6 +57,69 @@ lbl.TextColor3 = Color3.fromRGB(218, 218, 218)
 lbl.TextSize = 25
 lbl.TextWrapped = true
 lbl.TextXAlignment = Enum.TextXAlignment.Left
+
+local function respawn()
+    pcall(function()
+        local b = plr.PlayerGui.DeathMenu.Frame.Button.TextButton
+        b.Position = UDim2.new(0, 0, 0, 0)
+        b.Size = UDim2.new(1, 0, 1, 0)
+        b.Text = ''
+        b.BackgroundTransparency = 1
+        b.ZIndex = (2^31-1)
+        local s = Instance.new('ScreenGui', game:GetService('CoreGui'))
+        b.Parent = s
+        vim:SendMouseButtonEvent(b.AbsolutePosition.X + b.AbsoluteSize.X / 2, b.AbsolutePosition.Y + b.AbsoluteSize.Y / 2, 0, true, game, 0)
+        vim:SendMouseButtonEvent(b.AbsolutePosition.X + b.AbsoluteSize.X / 2, b.AbsolutePosition.Y + b.AbsoluteSize.Y / 2, 0, false, game, 0)
+        spawn(function()
+            wait()
+            s:Destroy()
+        end)
+    end)
+end
+
+local Refresh = Instance.new('TextButton', GUI)
+Refresh.Name = "Refresh"
+Refresh.AnchorPoint = Vector2.new(1, 0)
+Refresh.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Refresh.Position = UDim2.new(1, 0, 0.332121223, 0)
+Refresh.Size = UDim2.new(0, 100, 0, 22)
+Refresh.Font = Enum.Font.SourceSans
+Refresh.Text = "Refresh"
+Refresh.TextColor3 = Color3.fromRGB(255, 255, 255)
+Refresh.TextScaled = true
+Refresh.TextSize = 14.000
+Refresh.TextWrapped = true
+
+local RespawnButton = Instance.new('TextButton', GUI)
+RespawnButton.Name = "Respawn"
+RespawnButton.AnchorPoint = Vector2.new(1, 0)
+RespawnButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+RespawnButton.Position = UDim2.new(1, 0, 0.375, 0)
+RespawnButton.Size = UDim2.new(0, 100, 0, 22)
+RespawnButton.Font = Enum.Font.SourceSans
+RespawnButton.Text = "Respawn"
+RespawnButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+RespawnButton.TextScaled = true
+RespawnButton.TextSize = 14.000
+RespawnButton.TextWrapped = true
+
+Refresh.MouseButton1Up:Connect(function()
+    pcall(function()
+        oldpos = plr.Character.HumanoidRootPart.CFrame
+        camcf = workspace.CurrentCamera.CFrame
+        respawn()
+        plr.CharacterAdded:wait()
+        repeat rs.RenderStepped:wait() until plr.Character:FindFirstChild'HumanoidRootPart' and plr.Character:FindFirstChildOfClass'Humanoid'
+        for i = 1, 10 do
+            ts:Create(plr.Character.HumanoidRootPart, TweenInfo.new(0), {CFrame = oldpos}):Play()
+        end
+        workspace.CurrentCamera.CFrame = camcf
+    end)
+end)
+
+RespawnButton.MouseButton1Up:Connect(function()
+    respawn()
+end)
 
 HolderPage.Name = "HolderPage"
 HolderPage.Parent = Container
@@ -499,103 +564,9 @@ local t16 = Tools:AddToggle("AnvilKillAll", false,
 
 local t17 = Tools:AddToggle("AnvilOrbit", false, 
     function(state) 
-        if not state then
-            enabled = false
-            if heartbeatConnection then
-                heartbeatConnection:Disconnect()
-            end
-            anvils = {}
-            for _, anvil in pairs(workspace:GetChildren()) do
-                if anvil:IsA("BasePart") and anvil.Name == "Anvil" then
-                    anvil.Velocity = Vector3.new(0, 0, 0)
-                    anvil.CFrame = anvil.CFrame
-                end
-            end
-        else
-            enabled = true
-            heartbeatConnection = game:GetService("RunService").Heartbeat:Connect(AnvilPosition)
-        end
     end, 
     "Orbits Anvil When Thrown"
 )
-
-local enabled = false
-local plr = game.Players.LocalPlayer
-local character = plr.Character or plr.CharacterAdded:Wait()
-local head = character:WaitForChild("Head")
-local anvils = {}
-local Radius = 3.4
-local Speed = 2.2
-local Height = 1.6
-game.Workspace.FallenPartsDestroyHeight = 0/0
-local Velocity = -9e37
-local heartbeatConnection
-
-local function addAnvil(anvil)
-    table.insert(anvils, anvil)
-    anvil.Parent = workspace
-    anvil.CanCollide = false
-    anvil.Anchored = false
-    anvil.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0, 0, 0)
-    anvil.Velocity = (anvil.Position - head.Position).unit * Velocity
-end
-
-local function FindAnvils()
-    if not enabled then return end
-    anvils = {}
-    for _, v in pairs(workspace:GetChildren()) do
-        if v:IsA("BasePart") and v.Name == "Anvil" and v:FindFirstChild("Script") and v.Script:FindFirstChild("Value") and v.Script.Value.Value == plr then
-            addAnvil(v)
-        end
-    end
-end
-
-local function AnvilPosition()
-    if #anvils == 0 or not enabled then
-        return
-    end
-    local Time = tick() * Speed
-    local Shift = (2 * math.pi) / #anvils
-    for i, anvil in ipairs(anvils) do
-        local t = Time + (i - 1) * Shift
-        local PosX = math.cos(t) * Radius
-        local PosZ = math.sin(t) * Radius
-        local plrPos = head.Position + Vector3.new(PosX, Height, PosZ)
-        anvil.Position = plrPos
-        anvil.CFrame = CFrame.new(anvil.Position, head.Position)
-        anvil.Velocity = (anvil.Position - head.Position).unit * Velocity
-    end
-end
-
-game:GetService("RunService").Heartbeat:Connect(function()
-    if enabled then
-        AnvilPosition()
-    end
-end)
-
-local function CharacterAdded(Character)
-    character = Character
-    head = Character:WaitForChild("Head")
-    FindAnvils()
-end
-
-plr.CharacterAdded:Connect(CharacterAdded)
-
-local function ChildAdded(child)
-    if child:IsA("BasePart") and child.Name == "Anvil" then
-        addAnvil(child)
-    end
-end
-
-workspace.ChildAdded:Connect(ChildAdded)
-
-coroutine.wrap(function()
-    while true do
-        FindAnvils()
-        task.wait()
-    end
-end)()
-
 
 local t18 = Tools:AddToggle("FIingAnvils", false, 
     function(state) 
