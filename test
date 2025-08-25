@@ -1,3 +1,13 @@
+local message = "Script Executed Successfully!" -- Message to display
+local duration = 3 -- Duration in seconds
+
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Notification", 
+    Text = message, 
+    Duration = duration
+})
+
+
 local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("GUI")
 if FGUI then
     FGUI:Destroy()
