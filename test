@@ -747,3 +747,7 @@ end)
 local x13 = Keybinds:AddBox("SpinFIing", "Type any Letter to Change Bind")
 x13.FocusLost:Connect(function()
 end)
+
+local Menu = Lib.AddPage("Menu", "Show's Menu Tab")
+local Ui = Lib.AddPage("Ui", "Show's Ui Tab")
+local Info = Lib.AddPage("Info", "Show's Info Tab")
