@@ -783,7 +783,9 @@ local b4 = Tools:AddButton("PunchSelected",
                     local char = plr.Character
                     local rightHand = char:FindFirstChild("RightHand")
                     if rightHand then
-                        rightHand.CFrame = CFrame.new(targetHRP.Position)
+                        targetHRP.CFrame = rightHand.CFrame
+                        targetHRP.Transparency = 1
+                        targetHRP.CanCollide = false
                         firetouchinterest(rightHand, targetHRP, 0)
                     end
                 end
@@ -795,49 +797,68 @@ local b4 = Tools:AddButton("PunchSelected",
 
 local t21 = Tools:AddToggle("AutoPunchSelected", false, 
     function(state)
+        local connection
+        local targetsHRP = {}
+
         if state then
-            local connection
-            connection = rs.Heartbeat:Connect(function()
-                if not state then
-                    connection:Disconnect()
-                    return
-                end
-
-                local tool = plr.Backpack:FindFirstChild('Punch') or plr.Character:FindFirstChild('Punch')
-                if not tool then
-                    tool = plr.Backpack:FindFirstChild('Punch')
-                    if tool then
-                        tool.Parent = plr.Character
-                    end
-                end
-
-                if tool and not plr.Character:FindFirstChild('Punch') then
+            local tool = plr.Backpack:FindFirstChild('Punch') or plr.Character:FindFirstChild('Punch')
+            if not tool then
+                tool = plr.Backpack:FindFirstChild('Punch')
+                if tool then
                     tool.Parent = plr.Character
                 end
+            end
 
-                if tool then
-                    tool:Activate()
+            if tool then
+                tool:Activate()
+            end
 
-                    for _, targetId in pairs(targets) do
-                        local targetPlayer = game.Players:GetPlayerByUserId(targetId)
-                        if targetPlayer and targetPlayer.Character then
-                            local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-                            if targetHRP then
-                                local char = plr.Character
-                                local rightHand = char:FindFirstChild("RightHand")
-                                if rightHand then
-                                    rightHand.CFrame = CFrame.new(targetHRP.Position)
-                                    firetouchinterest(rightHand, targetHRP, 0)
-                                end
+            connection = rs.Heartbeat:Connect(function()
+                for _, targetId in pairs(targets) do
+                    local targetPlayer = game.Players:GetPlayerByUserId(targetId)
+                    if targetPlayer and targetPlayer.Character then
+                        local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        if targetHRP then
+                            if not targetsHRP[targetId] then
+                                targetsHRP[targetId] = targetHRP
+                                targetHRP.Transparency = 1
+                                targetHRP.CanCollide = false
+                            end
+                            local char = plr.Character
+                            local rightHand = char:FindFirstChild("RightHand")
+                            if rightHand then
+                                targetHRP.CFrame = rightHand.CFrame
                             end
                         end
                     end
                 end
             end)
+        else
+            if connection then
+                connection:Disconnect()
+            end
+
+            for _, targetId in pairs(targets) do
+                local targetPlayer = game.Players:GetPlayerByUserId(targetId)
+                if targetPlayer and targetPlayer.Character then
+                    local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if targetHRP and targetsHRP[targetId] then
+                        targetHRP.Transparency = 0
+                        targetHRP.CanCollide = true
+                        targetsHRP[targetId] = nil
+                    end
+                end
+            end
+
+            local tool = plr.Backpack:FindFirstChild('Punch') or plr.Character:FindFirstChild('Punch')
+            if tool then
+                tool.Parent = plr.Backpack
+            end
         end
     end, 
     "AutoPunches SelectedPlayer"
 )
+
 
 local t22 = Tools:AddToggle("SpamBomb", false, 
     function(state) 
