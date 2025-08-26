@@ -783,6 +783,7 @@ local b4 = Tools:AddButton("PunchSelected",
                     local char = plr.Character
                     local rightHand = char:FindFirstChild("RightHand")
                     if rightHand then
+                        rightHand.CFrame = CFrame.new(targetHRP.Position)
                         firetouchinterest(rightHand, targetHRP, 0)
                     end
                 end
@@ -794,8 +795,41 @@ local b4 = Tools:AddButton("PunchSelected",
 
 local t21 = Tools:AddToggle("AutoPunchSelected", false, 
     function(state) 
+        if state then
+            while t21.Value do
+                local tool = plr.Backpack:FindFirstChild('Punch') or plr.Character:FindFirstChild('Punch')
+                if not tool then
+                    tool = plr.Backpack:FindFirstChild('Punch')
+                    if tool then
+                        tool.Parent = plr.Character
+                    end
+                end
+
+                if tool then
+                    tool:Activate()
+
+                    for _, target in pairs(targets) do
+                        local targetPlayer = game.Players:GetPlayerByUserId(_) 
+                        if targetPlayer and targetPlayer.Character then
+                            local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                            if targetHRP then
+                                local char = plr.Character
+                                local rightHand = char:FindFirstChild("RightHand")
+                                if rightHand then
+                                    rightHand.CFrame = CFrame.new(targetHRP.Position)
+                                    firetouchinterest(rightHand, targetHRP, 0)
+                                end
+                            end
+                        end
+                    end
+                end
+
+                task.wait(16)
+            end
+        end
     end, 
-    "AutoPunches SelectedPlayer")
+    "AutoPunches SelectedPlayer"
+)
 
 local t22 = Tools:AddToggle("SpamBomb", false, 
     function(state) 
