@@ -824,12 +824,13 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
                     end
                 end
 
-                task.wait(16)
+                task.wait(0.5)
             end
         end
     end, 
     "AutoPunches SelectedPlayer"
 )
+
 
 local t22 = Tools:AddToggle("SpamBomb", false, 
     function(state) 
