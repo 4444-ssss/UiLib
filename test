@@ -2,31 +2,31 @@ local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("
 if FGUI then
     FGUI:Destroy()
 end
-local RunSrv = game:GetService('RunService')
-local Players = game:GetService("Players")
-local LPlayer = Players.LocalPlayer
-local VInput = game:GetService('VirtualInputManager')
-local TweenSrv = game:GetService('TweenService')
+local rs = game:GetService('RunService')
+local plrs = game:GetService("Players")
+local plr = plrs.LocalPlayer
+local vim = game:GetService('VirtualInputManager')
+local ts = game:GetService('TweenService')
 local LoopFlingV1 = {}
 local LoopFlingV2 = {}
-local Char = LPlayer.Character or LPlayer.CharacterAdded:Wait()
-local Head = Char:WaitForChild("Head")
-local Anvils = {}
-local Targets = {}
-local WList = {}
-local KillAll = false
-local OrbRadius = 3.4
-local OrbSpeed = 2.2
-local OrbHeight = 1.6
+local character = plr.Character or plr.CharacterAdded:Wait()
+local head = character:WaitForChild("Head")
+local anvils = {}
+local targets = {}
+local whitelist = {}
+local killAll = false
+local Radius = 3.4
+local Speed = 2.2
+local Height = 1.6
 workspace.FallenPartsDestroyHeight = 0/0
-local OrbVelocity = -9e37
+local Velocity = -9e37
 
 local function findplr(Target)
-    local player = Players:FindFirstChild(Target)
+    local player = plrs:FindFirstChild(Target)
     if player then
         return player
     else
-        for _, v in pairs(Players:GetPlayers()) do
+        for _, v in pairs(plrs:GetPlayers()) do
             if v.Name:lower():sub(1, #Target) == Target:lower() or v.DisplayName:lower():sub(1, #Target) == Target:lower() then
                 return v
             end
@@ -71,7 +71,7 @@ lbl.TextXAlignment = Enum.TextXAlignment.Left
 
 local function respawn()
     pcall(function()
-        local b = LPlayer.PlayerGui.DeathMenu.Frame.Button.TextButton
+        local b = plr.PlayerGui.DeathMenu.Frame.Button.TextButton
         b.Position = UDim2.new(0, 0, 0, 0)
         b.Size = UDim2.new(1, 0, 1, 0)
         b.Text = ''
@@ -79,8 +79,8 @@ local function respawn()
         b.ZIndex = (2^31-1)
         local s = Instance.new('ScreenGui', game:GetService('CoreGui'))
         b.Parent = s
-        VInput:SendMouseButtonEvent(b.AbsolutePosition.X + b.AbsoluteSize.X / 2, b.AbsolutePosition.Y + b.AbsoluteSize.Y / 2, 0, true, game, 0)
-        VInput:SendMouseButtonEvent(b.AbsolutePosition.X + b.AbsoluteSize.X / 2, b.AbsolutePosition.Y + b.AbsoluteSize.Y / 2, 0, false, game, 0)
+        vim:SendMouseButtonEvent(b.AbsolutePosition.X + b.AbsoluteSize.X / 2, b.AbsolutePosition.Y + b.AbsoluteSize.Y / 2, 0, true, game, 0)
+        vim:SendMouseButtonEvent(b.AbsolutePosition.X + b.AbsoluteSize.X / 2, b.AbsolutePosition.Y + b.AbsoluteSize.Y / 2, 0, false, game, 0)
         spawn(function()
             wait()
             s:Destroy()
@@ -116,13 +116,13 @@ RespawnButton.TextWrapped = true
 
 Refresh.MouseButton1Up:Connect(function()
     pcall(function()
-        oldpos = LPlayer.Character.HumanoidRootPart.CFrame
+        oldpos = plr.Character.HumanoidRootPart.CFrame
         camcf = workspace.CurrentCamera.CFrame
         respawn()
-        LPlayer.CharacterAdded:wait()
-        repeat RunSrv.RenderStepped:wait() until LPlayer.Character:FindFirstChild'HumanoidRootPart' and LPlayer.Character:FindFirstChildOfClass'Humanoid'
+        plr.CharacterAdded:wait()
+        repeat rs.RenderStepped:wait() until plr.Character:FindFirstChild'HumanoidRootPart' and plr.Character:FindFirstChildOfClass'Humanoid'
         for i = 1, 10 do
-            TweenSrv:Create(LPlayer.Character.HumanoidRootPart, TweenInfo.new(0), {CFrame = oldpos}):Play()
+            ts:Create(plr.Character.HumanoidRootPart, TweenInfo.new(0), {CFrame = oldpos}):Play()
         end
         workspace.CurrentCamera.CFrame = camcf
     end)
@@ -353,7 +353,7 @@ function pageApi:AddBox(placeholderText, hovertipText)
     local baseText = lbl.Text
 
     Box.MouseEnter:Connect(function()
-        
+        -- Animate hover tip text
         local hoverText = hovertipText or ("Input: " .. (Box.Text == "" and "(empty)" or Box.Text))
         typeIntoLabel(hoverText)
     end)
@@ -425,20 +425,20 @@ x1.FocusLost:Connect(function()
         local accs = tar.Character:FindFirstChildOfClass('Accessory')
         if accs then
             if accs:FindFirstChild('Handle') then
-                LPlayer.Character.Picking:FireServer(accs.Handle, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+                plr.Character.Picking:FireServer(accs.Handle, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
                 wait(0.1)
-                LPlayer.Character.PuttingDown:FireServer()
+                plr.Character.PuttingDown:FireServer()
             elseif accs:IsA('BasePart') then
-                LPlayer.Character.Picking:FireServer(accs, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
+                plr.Character.Picking:FireServer(accs, Vector3.new(8.99999981e+37, -8.99999981e+37, 8.99999981e+37, 1, 0, 0, 0, 1, 0, 0, 0, 1))
                 wait(0.1)
-                LPlayer.Character.PuttingDown:FireServer()
+                plr.Character.PuttingDown:FireServer()
             end
             wait(0.1)
-            LPlayer.Character.PuttingDown:FireServer()
+            plr.Character.PuttingDown:FireServer()
         else
-            LPlayer.Character.Picking:FireServer(tar.Character.HumanoidRootPart, Vector3.new(9e37, -9e37, 9e37))
+            plr.Character.Picking:FireServer(tar.Character.HumanoidRootPart, Vector3.new(9e37, -9e37, 9e37))
             wait(0.1)
-            LPlayer.Character.PuttingDown:FireServer()
+            plr.Character.PuttingDown:FireServer()
         end
     end)
     x1.Text = ''
@@ -487,15 +487,15 @@ spawn(function()
                     local accs = v.Character:FindFirstChildOfClass('Accessory')
                     if accs then
                         if accs:FindFirstChild('Handle') then
-                            LPlayer.Character.Picking:FireServer(accs.Handle, Vector3.new(9e37, -9e37, 9e37))
+                            plr.Character.Picking:FireServer(accs.Handle, Vector3.new(9e37, -9e37, 9e37))
                         elseif accs:IsA('BasePart') then
-                            LPlayer.Character.Picking:FireServer(accs, Vector3.new(9e37, -9e37, 9e37))
+                            plr.Character.Picking:FireServer(accs, Vector3.new(9e37, -9e37, 9e37))
                         end
                     else
-                        LPlayer.Character.Picking:FireServer(v.Character.HumanoidRootPart, Vector3.new(9e37, -9e37, 9e37))
+                        plr.Character.Picking:FireServer(v.Character.HumanoidRootPart, Vector3.new(9e37, -9e37, 9e37))
                     end
                     wait(0.1)
-                    LPlayer.Character.PuttingDown:FireServer()
+                    plr.Character.PuttingDown:FireServer()
                 end)
             end
         end
@@ -562,38 +562,38 @@ local anvilKillAllToggle = false
 local anvilOrbitToggle = false
 
 local function addAnvil(anvil)
-    table.insert(Anvils, anvil)
+    table.insert(anvils, anvil)
     anvil.Parent = workspace
     anvil.CanCollide = false
     anvil.Anchored = false
     anvil.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0, 0, 0)
-    anvil.OrbVelocity = (anvil.Position - Head.Position).unit * OrbVelocity
+    anvil.Velocity = (anvil.Position - head.Position).unit * Velocity
 end
 
 local function FindAnvils()
-    Anvils = {}
+    anvils = {}
     for _, v in pairs(workspace:GetChildren()) do
-        if v:IsA("BasePart") and v.Name == "Anvil" and v:FindFirstChild("Script") and v.Script:FindFirstChild("Value") and v.Script.Value.Value == LPlayer then
+        if v:IsA("BasePart") and v.Name == "Anvil" and v:FindFirstChild("Script") and v.Script:FindFirstChild("Value") and v.Script.Value.Value == plr then
             addAnvil(v)
         end
     end
 end
 
 local function AnvilPosition()
-    if #Anvils == 0 then return end
-    local Time = tick() * OrbSpeed
-    local Shift = (2 * math.pi) / #Anvils
-    for i, anvil in ipairs(Anvils) do
+    if #anvils == 0 then return end
+    local Time = tick() * Speed
+    local Shift = (2 * math.pi) / #anvils
+    for i, anvil in ipairs(anvils) do
         local t = Time + (i - 1) * Shift
-        local PosX = math.cos(t) * OrbRadius
-        local PosZ = math.sin(t) * OrbRadius
-        local plrPos = Head.Position + Vector3.new(PosX, OrbHeight, PosZ)
+        local PosX = math.cos(t) * Radius
+        local PosZ = math.sin(t) * Radius
+        local plrPos = head.Position + Vector3.new(PosX, Height, PosZ)
         anvil.Position = plrPos
-        anvil.CFrame = CFrame.new(anvil.Position, Head.Position)
-        anvil.OrbVelocity = (anvil.Position - Head.Position).unit * OrbVelocity
-        for userId, _ in pairs(Targets) do
-            local target = Players:GetPlayerByUserId(userId)
-            if target and target.Character and not WList[userId] then
+        anvil.CFrame = CFrame.new(anvil.Position, head.Position)
+        anvil.Velocity = (anvil.Position - head.Position).unit * Velocity
+        for userId, _ in pairs(targets) do
+            local target = plrs:GetPlayerByUserId(userId)
+            if target and target.Character and not whitelist[userId] then
                 local torso = target.Character:FindFirstChild("UpperTorso") or target.Character:FindFirstChild("HumanoidRootPart")
                 if torso then
                     firetouchinterest(anvil, torso, 0)
@@ -605,21 +605,21 @@ local function AnvilPosition()
 end
 
 local function stopAnvils()
-    Anvils = {}
-    Targets = {}
-    KillAll = false
+    anvils = {}
+    targets = {}
+    killAll = false
     anvilKillToggle = false
     anvilKillAllToggle = false
     anvilOrbitToggle = false
 end
 
-RunSrv.Heartbeat:Connect(function()
+rs.Heartbeat:Connect(function()
     if anvilOrbitToggle then
         AnvilPosition()
     else
-        if #Anvils > 0 then
-            for _, anvil in ipairs(Anvils) do
-                anvil.OrbVelocity = (anvil.Position - Head.Position).unit * OrbVelocity
+        if #anvils > 0 then
+            for _, anvil in ipairs(anvils) do
+                anvil.Velocity = (anvil.Position - head.Position).unit * Velocity
             end
         else
             stopAnvils()
@@ -628,11 +628,11 @@ RunSrv.Heartbeat:Connect(function()
 end)
 
 local function CharacterAdded(Character)
-    Char = Character
-    Head = Character:WaitForChild("Head")
+    character = Character
+    head = Character:WaitForChild("Head")
     FindAnvils()
 end
-LPlayer.CharacterAdded:Connect(CharacterAdded)
+plr.CharacterAdded:Connect(CharacterAdded)
 
 workspace.ChildAdded:Connect(function(child)
     if child:IsA("BasePart") and child.Name == "Anvil" then
@@ -648,11 +648,11 @@ coroutine.wrap(function()
 end)()
 
 local function findplr(Target)
-    local player = Players:FindFirstChild(Target)
+    local player = plrs:FindFirstChild(Target)
     if player then
         return player
     else
-        for _, v in pairs(Players:GetPlayers()) do
+        for _, v in pairs(plrs:GetPlayers()) do
             if v.Name:lower():sub(1, #Target) == Target:lower() or v.DisplayName:lower():sub(1, #Target) == Target:lower() then
                 return v
             end
@@ -666,7 +666,7 @@ x6.FocusLost:Connect(function()
     local playerName = x6.Text
     local player = findplr(playerName)
     if player then
-        Targets[player.UserId] = true
+        targets[player.UserId] = true
         x6.Text = ''
     end
 end)
@@ -682,15 +682,15 @@ local t16 = Tools:AddToggle("AnvilKillAll", false,
     function(state) 
         anvilKillAllToggle = state
         if state then
-            KillAll = true
-            for _, p in pairs(Players:GetPlayers()) do
-                if p ~= LPlayer and not WList[p.UserId] then
-                    Targets[p.UserId] = true
+            killAll = true
+            for _, p in pairs(plrs:GetPlayers()) do
+                if p ~= plr and not whitelist[p.UserId] then
+                    targets[p.UserId] = true
                 end
             end
         else
-            KillAll = false
-            Targets = {}
+            killAll = false
+            targets = {}
         end
     end, 
     "AnvilKills All Players"
@@ -722,30 +722,30 @@ local function activateAnvil()
     if anvilEnabled then
         local c = 0
         repeat
-            RunSrv.RenderStepped:Wait()
+            rs.RenderStepped:Wait()
             c = c + 1
-        until (LPlayer.Character
-            and LPlayer.Character:FindFirstChild("HumanoidRootPart")
-            and LPlayer:FindFirstChild("Backpack")
-            and LPlayer.Backpack:FindFirstChild("Anvil"))
+        until (plr.Character
+            and plr.Character:FindFirstChild("HumanoidRootPart")
+            and plr:FindFirstChild("Backpack")
+            and plr.Backpack:FindFirstChild("Anvil"))
             or c >= 200
 
         if c < 200 then
-            local tool = LPlayer.Backpack.Anvil
-            if not LPlayer.Character:FindFirstChild("Anvil") then
-                tool.Parent = LPlayer.Character
+            local tool = plr.Backpack.Anvil
+            if not plr.Character:FindFirstChild("Anvil") then
+                tool.Parent = plr.Character
                 task.wait(0.1)
                 tool:Activate()
-                if LPlayer.Character:FindFirstChild("Anvil") then
+                if plr.Character:FindFirstChild("Anvil") then
                     while anvilEnabled do
-                        LPlayer.Character.Anvil.send:FireServer(
-                            LPlayer.Character.HumanoidRootPart.CFrame.p + Vector3.new(0, -10, 0)
+                        plr.Character.Anvil.send:FireServer(
+                            plr.Character.HumanoidRootPart.CFrame.p + Vector3.new(0, -10, 0)
                         )
                         task.wait(1)
-                        tool.Parent = LPlayer.Backpack
+                        tool.Parent = plr.Backpack
                         task.wait(30)
                         if not anvilEnabled then break end
-                        tool.Parent = LPlayer.Character
+                        tool.Parent = plr.Character
                         task.wait(0.1)
                         tool:Activate()
                     end
@@ -759,28 +759,28 @@ local t20 = Tools:AddToggle("AutoThrow", false,
     function(state) 
         anvilEnabled = state
         if state then
-            if not LPlayer.Character:FindFirstChild("Anvil") then
+            if not plr.Character:FindFirstChild("Anvil") then
                 activateAnvil()
             end
         end
     end, 
     "AutoThrows Anvil")
 
-anvilConnection = LPlayer.CharacterAdded:Connect(function()
-    if anvilEnabled and not LPlayer.Character:FindFirstChild("Anvil") then
+anvilConnection = plr.CharacterAdded:Connect(function()
+    if anvilEnabled and not plr.Character:FindFirstChild("Anvil") then
         activateAnvil()
     end
 end)
 
-if LPlayer.Character then
-    if anvilEnabled and not LPlayer.Character:FindFirstChild("Anvil") then
+if plr.Character then
+    if anvilEnabled and not plr.Character:FindFirstChild("Anvil") then
         activateAnvil()
     end
 end
 
 local b3 = Tools:AddButton("ClearSelected", 
     function() 
-        Targets = {}  
+        targets = {}  
     end, 
     "Clears SelectedPlayer"
 )
