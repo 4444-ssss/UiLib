@@ -44,8 +44,6 @@ local Holder = Instance.new("Frame")
 local TabsButtonsHolder = Instance.new("ScrollingFrame")
 local UIGridLayoutTabs = Instance.new("UIGridLayout")
 local str = Instance.new("UIStroke")
-local Openbtn = Instance.new("TextButton")
-
 
 GUI.Name = "GUI"
 GUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -70,39 +68,6 @@ lbl.TextColor3 = Color3.fromRGB(218, 218, 218)
 lbl.TextSize = 25
 lbl.TextWrapped = true
 lbl.TextXAlignment = Enum.TextXAlignment.Left
-
-Openbtn.Name = "Openbtn"
-Openbtn.Parent = GUI
-Openbtn.Size = UDim2.new(0, 100, 0, 50)
-Openbtn.Position = UDim2.new(0.5, -50, 0.5, -25)
-Openbtn.Text = "Open Menu"
-Openbtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Openbtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-Openbtn.Font = Enum.Font.SourceSans
-Openbtn.TextSize = 18
-
-local function closeHolder()
-    Holder:TweenPosition(UDim2.new(0.5, -200, 0.5, -150), Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.25, true)
-    HolderPage:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.25, true)
-end
-
-local function openHolder()
-    Holder.Visible = true
-    HolderPage.Visible = true
-    Holder:TweenPosition(UDim2.new(0.5, -200, 0.5, -150), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.25, true)
-    HolderPage:TweenSize(UDim2.new(0, 400, 0, 244), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.25, true)
-end
-
--- Openbtn click event with text change (Open/Close)
-Openbtn.MouseButton1Click:Connect(function()
-    if Holder.Visible then
-        closeHolder()
-        Openbtn.Text = "Open" -- Change text to "Open Menu" when closed
-    else
-        openHolder()
-        Openbtn.Text = "Close" -- Change text to "Close Menu" when opened
-    end
-end)
 
 local function respawn()
     pcall(function()
@@ -725,13 +690,38 @@ local t17 = Tools:AddToggle("AnvilOrbit", false,
 
 local t18 = Tools:AddToggle("FIingAnvils", false, 
     function(state) 
+        if state then
+            local function c()
+                rs.Heartbeat:Connect(function()
+                    if not plr.Parent then return end
+                    for _, v in pairs(workspace:GetChildren()) do
+                        if v:IsA("BasePart") and v.Name == "Anvil" and v:FindFirstChild("Script") and v.Script:FindFirstChild("Value") and v.Script.Value ~= plr then
+                            plr.Character.Picking:FireServer(v, Vector3.new(9e38, -9e38, 9e38))
+                            task.wait(0.1)
+                            plr.Character.PuttingDown:FireServer()
+                        end
+                    end
+                end)
+            end
+
+            c()
+        else
+  plr.Character.PuttingDown:FireServer()
+        end
     end, 
     "FIings All Anvils")
 
 local t19 = Tools:AddToggle("HideAnvil", false, 
     function(state) 
+        if state then
+            Height = -900
+        else
+            Height = 3
+        end
     end, 
-    "HidesAnvils")
+    "Hides Anvils"
+)
+
 
 local anvilEnabled = false
 
@@ -899,10 +889,41 @@ local t23 = Tools:AddToggle("BombFIingSelected", false,
 
 local Global = Lib.AddPage("Global", "Show's Global Tab")
 
-local t24 = Global:AddToggle("BreakMap", false, 
-    function(state) 
-    end, 
-    "Breaks the Map")
+local t24
+local breaking = false
+local loop
+
+t24 = Global:AddToggle("BreakMap", false, function(state)
+    if state then
+        breaking = true
+        loop = task.spawn(function()
+            while breaking do
+                for _, v in next, workspace.Map:GetDescendants() do
+                    if v:IsA("Part") and (
+                        v.Material == Enum.Material.Grass
+                        or (v.Material == Enum.Material.Plastic and v.Name == "Baseplate")
+                        or (v.Material == Enum.Material.Plastic and v.Color == Color3.fromRGB(0, 255, 0))
+                    ) then
+                        plr.Character.PuttingDown:FireServer()
+                        task.wait(0.1)
+                        plr.Character.Picking:FireServer(v, Vector3.new(
+                            math.random(-9e38, 1e38),
+                            math.random(-9e38, 1e38),
+                            math.random(-9e38, 1e38)
+                        ))
+                    end
+                end
+                task.wait()
+            end
+        end)
+    else
+        breaking = false
+        if loop then
+            task.cancel(loop)
+            loop = nil
+        end
+    end
+end, "Breaks the Map")
 
 local t25 = Global:AddToggle("LagServer", false, 
     function(state) 
@@ -914,10 +935,39 @@ local t26 = Global:AddToggle("DamageSound", false,
     end, 
     "Annoys Player(s) With the Loud Sound")
 
-local t27 = Global:AddToggle("FIingMapItems", false, 
-    function(state) 
-    end, 
-    "FIings All UnAnchored Items")
+local t27
+local flinging = false
+local flingitemsconn
+
+t27 = Global:AddToggle("FIingMapItems", false, function(state)
+    local pickableFolder = workspace:FindFirstChild("Map") 
+        and workspace.Map:FindFirstChild("Map") 
+        and workspace.Map.Map:FindFirstChild("Pickable")
+
+    if state and pickableFolder then
+        flinging = true
+        flingitemsconn = pickableFolder.ChildAdded:Connect(function(v)
+            if v:IsA("BasePart") and not v.Anchored then
+                plr.Character.Picking:FireServer(v, Vector3.new(math.huge, -math.huge, math.huge))
+                task.wait(0.05)
+                plr.Character.PuttingDown:FireServer()
+            end
+        end)
+        for _, v in next, pickableFolder:GetChildren() do
+            if v:IsA("BasePart") and not v.Anchored then
+                plr.Character.Picking:FireServer(v, Vector3.new(math.huge, -math.huge, math.huge))
+                task.wait(0.05)
+                plr.Character.PuttingDown:FireServer()
+            end
+        end
+    else
+        flinging = false
+        if flingitemsconn then
+            flingitemsconn:Disconnect()
+            flingitemsconn = nil
+        end
+    end
+end, "FIings All UnAnchored Items")
 
 local t28 = Global:AddToggle("BugMap", false, 
     function(state) 
