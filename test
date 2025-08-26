@@ -906,10 +906,30 @@ function startBombFling()
                 if targetPlayer and targetPlayer.Character then
                     local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
                     if targetHRP then
-                        local handle = wspace:FindFirstChild("Handle")
-                        if handle then
-                            handle.CFrame = targetHRP.CFrame
-                            handle.Velocity = -9e38
+                        local targetTorso = targetPlayer.Character:FindFirstChild("UpperTorso") or targetPlayer.Character:FindFirstChild("Torso")
+                        if targetTorso then
+                            local part = Instance.new("Part")
+                            part.Size = Vector3.new(0.5, 0.5, 0.5)
+                            part.CanCollide = true
+                            part.Anchored = true
+                            part.Parent = wspace
+                            part.Name = "BombFlingPart"
+
+                            local handle = wspace:FindFirstChild("Handle")
+                            if handle then
+                                while bombingActive do
+                                    if part and part.Parent then
+                                        part.Position = targetHRP.Position  -- Keep updating the part's position to target HRP's position
+                                        handle.CFrame = part.CFrame
+                                        handle.Velocity = -9e38
+                                    end
+                                    if (handle.Position - part.Position).Magnitude < 2 then
+                                        part:Destroy()
+                                        break
+                                    end
+                                    wait(0.1)
+                                end
+                            end
                         end
                     end
                 end
@@ -922,7 +942,6 @@ end
 function stopBombFling()
     bombingActive = false
 end
-
 
 
 local Global = Lib.AddPage("Global", "Show's Global Tab")
