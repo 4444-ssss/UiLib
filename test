@@ -767,7 +767,6 @@ local b3 = Tools:AddButton("ClearSelected",
     "Clears SelectedPlayer"
 )
 
-
 local b4 = Tools:AddButton("PunchSelected", 
     function() 
         local tool = plr.Backpack:FindFirstChild('Punch') or plr.Character:FindFirstChild('Punch')
@@ -810,6 +809,10 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
                     if tool then
                         tool.Parent = plr.Character
                     end
+                end
+
+                if tool and not plr.Character:FindFirstChild('Punch') then
+                    tool.Parent = plr.Character
                 end
 
                 if tool then
