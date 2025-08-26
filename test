@@ -557,7 +557,6 @@ local b2 = Main:AddButton("PermaGod",
 
 local Tools = Lib.AddPage("Tools", "Show's Tools Tab")
 
-
 local anvilKillToggle = false
 local anvilKillAllToggle = false
 local anvilOrbitToggle = false
@@ -618,7 +617,13 @@ rs.Heartbeat:Connect(function()
     if anvilOrbitToggle then
         AnvilPosition()
     else
-        stopAnvils()
+        if #anvils > 0 then
+            for _, anvil in ipairs(anvils) do
+                anvil.Velocity = (anvil.Position - head.Position).unit * Velocity
+            end
+        else
+            stopAnvils()
+        end
     end
 end)
 
