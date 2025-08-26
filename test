@@ -708,12 +708,9 @@ local t17 = Tools:AddToggle("AnvilOrbit", false,
 
 local t18 = Tools:AddToggle("FIingAnvils", false, 
     function(state) 
-        local plr = game.Players.LocalPlayer
-        local RunService = game:GetService("RunService")
-
         if state then
             local function flingAnvils()
-                RunService.Heartbeat:Connect(function()
+                rs.Heartbeat:Connect(function()
                     if plr.Parent == nil then return end
                     if not t18:Get() then
                         return
@@ -739,6 +736,7 @@ local t18 = Tools:AddToggle("FIingAnvils", false,
     end, 
     "FIings All Anvils"
 )
+
 
 local t19 = Tools:AddToggle("HideAnvil", false, 
     function(state) 
@@ -832,8 +830,6 @@ local b4 = Tools:AddButton("PunchSelected",
                 if tool then
                     tool.Parent = plr.Character
                     tool:Activate()
-                    plr.Character.RagdollEvent:FireServer()
-                    wait()
                     firetouchinterest(char.RightHand, char.HumanoidRootPart, 0)
                     firetouchinterest(char.RightHand, char.HumanoidRootPart, 1)
                     respawn()
@@ -844,38 +840,36 @@ local b4 = Tools:AddButton("PunchSelected",
     "Punches SelectedPlayer Once"
 )
 
-local t21 = Tools:AddToggle("AutoPunchSelected", false, 
+local t12 = Main:AddToggle("AutoPunch", false, 
     function(state) 
-        if state then
-            local selectedPlayer = nil
-            for userId, _ in pairs(targets) do
-                selectedPlayer = plrs:GetPlayerByUserId(userId)
-                break
-            end
-            if selectedPlayer then
-                spawn(function()
-                    while t21:Get() do
-                        local char = selectedPlayer.Character
-                        if char and char:FindFirstChild("HumanoidRootPart") then
-                            repeat rs.RenderStepped:wait() until plr.PlayerGui.DeathMenu.Frame.Button:FindFirstChild'TextButton' 
-                                and char:FindFirstChild'HumanoidRootPart' 
-                                and (plr.Backpack:FindFirstChild'Punch' or char:FindFirstChild'Punch')
+        local selectedPlayer = nil
+        for userId, _ in pairs(targets) do
+            selectedPlayer = plrs:GetPlayerByUserId(userId)
+            break
+        end
+        if selectedPlayer then
+            local function punchLoop()
+                while t12:Get() do
+                    local char = selectedPlayer.Character
+                    if char and char:FindFirstChild("HumanoidRootPart") then
+                        repeat rs.RenderStepped:wait() until plr.PlayerGui.DeathMenu.Frame.Button:FindFirstChild'TextButton' 
+                            and char:FindFirstChild'HumanoidRootPart' 
+                            and (plr.Backpack:FindFirstChild'Punch' or char:FindFirstChild'Punch')
 
-                            local tool = plr.Backpack:FindFirstChild'Punch' or plr.Character:FindFirstChild'Punch'
-                            if tool then
-                                tool.Parent = plr.Character
-                                tool:Activate()
-                                plr.Character.RagdollEvent:FireServer()
-                                wait()
-                                firetouchinterest(char.RightHand, char.HumanoidRootPart, 0)
-                                firetouchinterest(char.RightHand, char.HumanoidRootPart, 1)
-                                respawn()
-                            end
+                        local tool = plr.Backpack:FindFirstChild'Punch' or plr.Character:FindFirstChild'Punch'
+                        if tool then
+                            tool.Parent = plr.Character
+                            tool:Activate()
+                            firetouchinterest(char.RightHand, char.HumanoidRootPart, 0)
+                            firetouchinterest(char.RightHand, char.HumanoidRootPart, 1)
+                            respawn()
                         end
-                        wait(0.1)
                     end
-                end)
+                    wait(0.1)
+                end
             end
+
+            punchLoop()
         end
     end, 
     "AutoPunches SelectedPlayer Continuously"
