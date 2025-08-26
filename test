@@ -690,38 +690,13 @@ local t17 = Tools:AddToggle("AnvilOrbit", false,
 
 local t18 = Tools:AddToggle("FIingAnvils", false, 
     function(state) 
-        if state then
-            local function c()
-                rs.Heartbeat:Connect(function()
-                    if not plr.Parent then return end
-                    for _, v in pairs(workspace:GetChildren()) do
-                        if v:IsA("BasePart") and v.Name == "Anvil" and v:FindFirstChild("Script") and v.Script:FindFirstChild("Value") and v.Script.Value ~= plr then
-                            plr.Character.Picking:FireServer(v, Vector3.new(9e38, -9e38, 9e38))
-                            task.wait(0.1)
-                            plr.Character.PuttingDown:FireServer()
-                        end
-                    end
-                end)
-            end
-
-            c()
-        else
-  plr.Character.PuttingDown:FireServer()
-        end
     end, 
     "FIings All Anvils")
 
 local t19 = Tools:AddToggle("HideAnvil", false, 
     function(state) 
-        if state then
-            Height = -900
-        else
-            Height = 3
-        end
     end, 
-    "Hides Anvils"
-)
-
+    "HidesAnvils")
 
 local anvilEnabled = false
 
@@ -879,51 +854,79 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
 
 local t22 = Tools:AddToggle("SpamBomb", false, 
     function(state) 
+        if state then
+            spawnBombSpam()
+        else
+            stopBombSpam()
+        end
     end, 
     "SpamsBomb")
 
+local bombingActive = false
+
+function spawnBombSpam()
+    bombingActive = true
+    while bombingActive do
+        wait(1)
+        local plr = game.Players.LocalPlayer
+        for _, v in next, plr.Backpack:GetChildren() do
+            if v.Name == "Bomb" then
+                v.Parent = plr.Character
+                v:Activate()
+                respawn()
+                wait(1)
+            end
+        end
+    end
+end
+
+function stopBombSpam()
+    bombingActive = false
+end
+
 local t23 = Tools:AddToggle("BombFIingSelected", false, 
     function(state) 
+        if state then
+            startBombFiring()
+        else
+            stopBombFiring()
+        end
     end, 
     "BombFIings SelectedPlayer")
 
-local Global = Lib.AddPage("Global", "Show's Global Tab")
+local selectedBombingActive = false
+local selectedPlayer = nil
 
-local t24
-local breaking = false
-local loop
-
-t24 = Global:AddToggle("BreakMap", false, function(state)
-    if state then
-        breaking = true
-        loop = task.spawn(function()
-            while breaking do
-                for _, v in next, workspace.Map:GetDescendants() do
-                    if v:IsA("Part") and (
-                        v.Material == Enum.Material.Grass
-                        or (v.Material == Enum.Material.Plastic and v.Name == "Baseplate")
-                        or (v.Material == Enum.Material.Plastic and v.Color == Color3.fromRGB(0, 255, 0))
-                    ) then
-                        plr.Character.PuttingDown:FireServer()
-                        task.wait(0.1)
-                        plr.Character.Picking:FireServer(v, Vector3.new(
-                            math.random(-9e38, 1e38),
-                            math.random(-9e38, 1e38),
-                            math.random(-9e38, 1e38)
-                        ))
-                    end
+function startBombFiring()
+    selectedBombingActive = true
+    while selectedBombingActive do
+        wait(1)
+        if selectedPlayer then
+            local target = selectedPlayer.Character
+            local handle = workspace:FindFirstChild("Handle")
+            if target and handle then
+                local head = target:FindFirstChild("Head")
+                local torso = target:FindFirstChild("HumanoidRootPart")
+                if head and torso then
+                    handle.CFrame = torso.CFrame * CFrame.new(0, head.Position.Y - torso.Position.Y, 0)
+                    handle.Velocity = Vector3.new(0, -9e38, 0)
                 end
-                task.wait()
             end
-        end)
-    else
-        breaking = false
-        if loop then
-            task.cancel(loop)
-            loop = nil
         end
     end
-end, "Breaks the Map")
+end
+
+function stopBombFiring()
+    selectedBombingActive = false
+end
+
+
+local Global = Lib.AddPage("Global", "Show's Global Tab")
+
+local t24 = Global:AddToggle("BreakMap", false, 
+    function(state) 
+    end, 
+    "Breaks the Map")
 
 local t25 = Global:AddToggle("LagServer", false, 
     function(state) 
@@ -935,39 +938,10 @@ local t26 = Global:AddToggle("DamageSound", false,
     end, 
     "Annoys Player(s) With the Loud Sound")
 
-local t27
-local flinging = false
-local flingitemsconn
-
-t27 = Global:AddToggle("FIingMapItems", false, function(state)
-    local pickableFolder = workspace:FindFirstChild("Map") 
-        and workspace.Map:FindFirstChild("Map") 
-        and workspace.Map.Map:FindFirstChild("Pickable")
-
-    if state and pickableFolder then
-        flinging = true
-        flingitemsconn = pickableFolder.ChildAdded:Connect(function(v)
-            if v:IsA("BasePart") and not v.Anchored then
-                plr.Character.Picking:FireServer(v, Vector3.new(math.huge, -math.huge, math.huge))
-                task.wait(0.05)
-                plr.Character.PuttingDown:FireServer()
-            end
-        end)
-        for _, v in next, pickableFolder:GetChildren() do
-            if v:IsA("BasePart") and not v.Anchored then
-                plr.Character.Picking:FireServer(v, Vector3.new(math.huge, -math.huge, math.huge))
-                task.wait(0.05)
-                plr.Character.PuttingDown:FireServer()
-            end
-        end
-    else
-        flinging = false
-        if flingitemsconn then
-            flingitemsconn:Disconnect()
-            flingitemsconn = nil
-        end
-    end
-end, "FIings All UnAnchored Items")
+local t27 = Global:AddToggle("FIingMapItems", false, 
+    function(state) 
+    end, 
+    "FIings All UnAnchored Items")
 
 local t28 = Global:AddToggle("BugMap", false, 
     function(state) 
