@@ -867,16 +867,15 @@ local bombingActive = false
 function spawnBombSpam()
     bombingActive = true
     while bombingActive do
-        wait(1)
         local plr = game.Players.LocalPlayer
         for _, v in next, plr.Backpack:GetChildren() do
             if v.Name == "Bomb" then
                 v.Parent = plr.Character
                 v:Activate()
                 respawn()
-                wait(1)
             end
         end
+        wait(0.1)  -- Reduced wait time to increase speed
     end
 end
 
@@ -895,21 +894,34 @@ local t23 = Tools:AddToggle("BombFIingSelected", false,
     "BombFIings SelectedPlayer")
 
 local selectedBombingActive = false
-local selectedPlayer = nil
+local targetPart = nil
 
 function startBombFiring()
     selectedBombingActive = true
     while selectedBombingActive do
         wait(1)
-        if selectedPlayer then
-            local target = selectedPlayer.Character
-            local handle = workspace:FindFirstChild("Handle")
-            if target and handle then
-                local head = target:FindFirstChild("Head")
-                local torso = target:FindFirstChild("HumanoidRootPart")
-                if head and torso then
-                    handle.CFrame = torso.CFrame * CFrame.new(0, head.Position.Y - torso.Position.Y, 0)
-                    handle.Velocity = Vector3.new(0, -9e38, 0)
+        for targetId, _ in pairs(targets) do
+            local targetPlayer = game.Players:GetPlayerByUserId(targetId)
+            if targetPlayer and targetPlayer.Character then
+                local target = targetPlayer.Character
+                local handle = workspace:FindFirstChild("Handle")
+                if target and handle then
+                    -- Create a small, invisible part inside the target character
+                    if not targetPart then
+                        targetPart = Instance.new("Part")
+                        targetPart.Size = Vector3.new(1, 1, 1)  -- Small size
+                        targetPart.Position = target.HumanoidRootPart.Position
+                        targetPart.Anchored = true
+                        targetPart.CanCollide = false
+                        targetPart.Transparency = 1  -- Fully invisible
+                        targetPart.Parent = target  -- Parent to the target's character
+                    end
+
+                    -- Move the handle's CFrame to follow the new part's position
+                    if targetPart then
+                        handle.CFrame = targetPart.CFrame
+                        handle.Velocity = Vector3.new(0, -9e38, 0)
+                    end
                 end
             end
         end
@@ -918,7 +930,13 @@ end
 
 function stopBombFiring()
     selectedBombingActive = false
+    -- Clean up the target part when bombing stops
+    if targetPart then
+        targetPart:Destroy()
+        targetPart = nil
+    end
 end
+
 
 
 local Global = Lib.AddPage("Global", "Show's Global Tab")
