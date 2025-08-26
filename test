@@ -2,6 +2,7 @@ local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("
 if FGUI then
     FGUI:Destroy()
 end
+local wspace = game:GetService("Workspace")
 local rs = game:GetService('RunService')
 local plrs = game:GetService("Players")
 local plr = plrs.LocalPlayer
@@ -886,43 +887,40 @@ end
 local t23 = Tools:AddToggle("BombFIingSelected", false, 
     function(state) 
         if state then
-            startBombFiring()
+            startBombFling()
         else
-            stopBombFiring()
+            stopBombFling()
         end
     end, 
-    "BombFIings SelectedPlayer")
+    "BombFIings SelectedPlayer"
+)
 
-local selectedBombingActive = false
-local selectedPlayer = nil
+local bombingActive = false
 
-function startBombFiring()
-    selectedBombingActive = true
-    while selectedBombingActive do
-        wait(0.1)
-        for targetId, _ in pairs(targets) do
-            local targetPlayer = game.Players:GetPlayerByUserId(targetId)
-            if targetPlayer and targetPlayer.Character then
-                local target = targetPlayer.Character
-                local handle = workspace:FindFirstChild("Handle")
-                if handle and handle.Material == Enum.Material.Plastic then
-                    local localHRP = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                    local targetHRP = target:FindFirstChild("HumanoidRootPart")
-                    if handle and localHRP then
-                        handle.CFrame = localHRP.CFrame
-                        handle.Velocity = -9e38
-                    end
-                    if targetHRP and localHRP then
-                        localHRP.CFrame = targetHRP.CFrame
+function startBombFling()
+    bombingActive = true
+    spawn(function()
+        while bombingActive do
+            for userId, _ in pairs(targets) do
+                local targetPlayer = game.Players:GetPlayerByUserId(userId)
+                if targetPlayer and targetPlayer.Character then
+                    local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if targetHRP then
+                        local handle = wspace:FindFirstChild("Handle")
+                        if handle then
+                            handle.CFrame = targetHRP.CFrame
+                            handle.Velocity = -9e38
+                        end
                     end
                 end
             end
+            wait(0.1)
         end
-    end
+    end)
 end
 
-function stopBombFiring()
-    selectedBombingActive = false
+function stopBombFling()
+    bombingActive = false
 end
 
 
