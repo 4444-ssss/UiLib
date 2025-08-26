@@ -557,6 +557,7 @@ local b2 = Main:AddButton("PermaGod",
 
 local Tools = Lib.AddPage("Tools", "Show's Tools Tab")
 
+
 local anvilKillToggle = false
 local anvilKillAllToggle = false
 local anvilOrbitToggle = false
@@ -617,13 +618,7 @@ rs.Heartbeat:Connect(function()
     if anvilOrbitToggle then
         AnvilPosition()
     else
-        if #anvils > 0 then
-            for _, anvil in ipairs(anvils) do
-                anvil.Velocity = (anvil.Position - head.Position).unit * Velocity
-            end
-        else
-            stopAnvils()
-        end
+        stopAnvils()
     end
 end)
 
@@ -647,19 +642,6 @@ coroutine.wrap(function()
     end
 end)()
 
-local function findplr(Target)
-    local player = plrs:FindFirstChild(Target)
-    if player then
-        return player
-    else
-        for _, v in pairs(plrs:GetPlayers()) do
-            if v.Name:lower():sub(1, #Target) == Target:lower() or v.DisplayName:lower():sub(1, #Target) == Target:lower() then
-                return v
-            end
-        end
-    end
-    return nil
-end
 
 local x6 = Tools:AddBox("SelectPlayer", "Type Player(s) Name or Display")
 x6.FocusLost:Connect(function()
@@ -708,35 +690,8 @@ local t17 = Tools:AddToggle("AnvilOrbit", false,
 
 local t18 = Tools:AddToggle("FIingAnvils", false, 
     function(state) 
-        if state then
-            local function flingAnvils()
-                rs.Heartbeat:Connect(function()
-                    if plr.Parent == nil then return end
-                    if not t18:Get() then
-                        return
-                    end
-
-                    for _, v in pairs(workspace:GetChildren()) do
-                        if v:IsA("BasePart") and v.Name == 'Anvil' and v:FindFirstChild('Script') then
-                            local scriptValue = v.Script:FindFirstChild('Value')
-                            if scriptValue and scriptValue.Value ~= plr then
-                                plr.Character.Picking:FireServer(v, Vector3.new(math.huge, -math.huge, math.huge))
-                                wait(0.1)
-                                plr.Character.PuttingDown:FireServer()
-                            end
-                        end
-                    end
-                end)
-            end
-
-            flingAnvils()
-        else
-            plr.Character.PuttingDown:FireServer()
-        end
     end, 
-    "FIings All Anvils"
-)
-
+    "FIings All Anvils")
 
 local t19 = Tools:AddToggle("HideAnvil", false, 
     function(state) 
@@ -814,65 +769,55 @@ local b3 = Tools:AddButton("ClearSelected",
 
 local b4 = Tools:AddButton("PunchSelected", 
     function() 
-        local selectedPlayer = nil
-        for userId, _ in pairs(targets) do
-            selectedPlayer = plrs:GetPlayerByUserId(userId)
-            break
-        end
-        if selectedPlayer then
-            local char = selectedPlayer.Character
-            if char and char:FindFirstChild("HumanoidRootPart") then
-                repeat rs.RenderStepped:wait() until plr.PlayerGui.DeathMenu.Frame.Button:FindFirstChild'TextButton' 
-                    and char:FindFirstChild'HumanoidRootPart' 
-                    and (plr.Backpack:FindFirstChild'Punch' or char:FindFirstChild'Punch')
+        for _, targetPlayer in pairs(targets) do
+            local target = game.Players:GetPlayerByUserId(targetPlayer)
+            if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+                local targetHRP = target.Character.HumanoidRootPart
+                local char = plr.Character
+                
+                repeat rs.RenderStepped:wait() until char:FindFirstChild('HumanoidRootPart') and (plr.Backpack:FindFirstChild('Punch') or char:FindFirstChild('Punch'))
+                
+                local tool = plr.Backpack:FindFirstChild('Punch') or plr.Character:FindFirstChild('Punch')
+                tool.Parent = plr.Character
+                tool:Activate()
 
-                local tool = plr.Backpack:FindFirstChild'Punch' or plr.Character:FindFirstChild'Punch'
-                if tool then
-                    tool.Parent = plr.Character
-                    tool:Activate()
-                    firetouchinterest(char.RightHand, char.HumanoidRootPart, 0)
-                    firetouchinterest(char.RightHand, char.HumanoidRootPart, 1)
-                    respawn()
-                end
+                firetouchinterest(char.RightHand, targetHRP, 0)
+                firetouchinterest(char.RightHand, targetHRP, 1)
+                
+                break
             end
         end
     end, 
-    "Punches SelectedPlayer Once"
+    "Punches Selected Player(s)"
 )
 
-local t12 = Main:AddToggle("AutoPunch", false, 
+local t21 = Tools:AddToggle("AutoPunchSelected", false, 
     function(state) 
-        local selectedPlayer = nil
-        for userId, _ in pairs(targets) do
-            selectedPlayer = plrs:GetPlayerByUserId(userId)
-            break
-        end
-        if selectedPlayer then
-            local function punchLoop()
-                while t12:Get() do
-                    local char = selectedPlayer.Character
-                    if char and char:FindFirstChild("HumanoidRootPart") then
-                        repeat rs.RenderStepped:wait() until plr.PlayerGui.DeathMenu.Frame.Button:FindFirstChild'TextButton' 
-                            and char:FindFirstChild'HumanoidRootPart' 
-                            and (plr.Backpack:FindFirstChild'Punch' or char:FindFirstChild'Punch')
+        autoPunchEnabled = state
+        if state then
+            while autoPunchEnabled do
+                for _, targetPlayer in pairs(targets) do
+                    local target = game.Players:GetPlayerByUserId(targetPlayer)
+                    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+                        local targetHRP = target.Character.HumanoidRootPart
+                        local char = plr.Character
+                        
+                        repeat rs.RenderStepped:wait() until char:FindFirstChild('HumanoidRootPart') and (plr.Backpack:FindFirstChild('Punch') or char:FindFirstChild('Punch'))
+                        
+                        local tool = plr.Backpack:FindFirstChild('Punch') or plr.Character:FindFirstChild('Punch')
+                        tool.Parent = plr.Character
+                        tool:Activate()
 
-                        local tool = plr.Backpack:FindFirstChild'Punch' or plr.Character:FindFirstChild'Punch'
-                        if tool then
-                            tool.Parent = plr.Character
-                            tool:Activate()
-                            firetouchinterest(char.RightHand, char.HumanoidRootPart, 0)
-                            firetouchinterest(char.RightHand, char.HumanoidRootPart, 1)
-                            respawn()
-                        end
+                        firetouchinterest(char.RightHand, targetHRP, 0)
+                        firetouchinterest(char.RightHand, targetHRP, 1)
+
+                        wait(0.5)
                     end
-                    wait(0.1)
                 end
             end
-
-            punchLoop()
         end
     end, 
-    "AutoPunches SelectedPlayer Continuously"
+    "AutoPunches Selected Player(s)"
 )
 
 local t22 = Tools:AddToggle("SpamBomb", false, 
