@@ -775,8 +775,8 @@ local b4 = Tools:AddButton("PunchSelected",
         tool.Parent = plr.Character
         tool:Activate()
 
-        for _, target in pairs(targets) do
-            local targetPlayer = game.Players:GetPlayerByUserId(_) 
+        for _, targetId in pairs(targets) do
+            local targetPlayer = game.Players:GetPlayerByUserId(targetId)
             if targetPlayer and targetPlayer.Character then
                 local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
                 if targetHRP then
@@ -808,8 +808,8 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
                 if tool then
                     tool:Activate()
 
-                    for _, target in pairs(targets) do
-                        local targetPlayer = game.Players:GetPlayerByUserId(_) 
+                    for _, targetId in pairs(targets) do
+                        local targetPlayer = game.Players:GetPlayerByUserId(targetId)
                         if targetPlayer and targetPlayer.Character then
                             local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
                             if targetHRP then
@@ -830,7 +830,6 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
     end, 
     "AutoPunches SelectedPlayer"
 )
-
 
 local t22 = Tools:AddToggle("SpamBomb", false, 
     function(state) 
@@ -984,3 +983,5 @@ end)
 local Menu = Lib.AddPage("Menu", "Show's Menu Tab")
 local Ui = Lib.AddPage("Ui", "Show's Ui Tab")
 local Info = Lib.AddPage("Info", "Show's Info Tab")
+
+print("test")
