@@ -767,6 +767,7 @@ local b3 = Tools:AddButton("ClearSelected",
     "Clears SelectedPlayer"
 )
 
+
 local b4 = Tools:AddButton("PunchSelected", 
     function() 
         local tool = plr.Backpack:FindFirstChild('Punch') or plr.Character:FindFirstChild('Punch')
@@ -794,9 +795,15 @@ local b4 = Tools:AddButton("PunchSelected",
 )
 
 local t21 = Tools:AddToggle("AutoPunchSelected", false, 
-    function(state) 
+    function(state)
         if state then
-            while t21.Value do
+            local connection
+            connection = rs.Heartbeat:Connect(function()
+                if not state then
+                    connection:Disconnect()
+                    return
+                end
+
                 local tool = plr.Backpack:FindFirstChild('Punch') or plr.Character:FindFirstChild('Punch')
                 if not tool then
                     tool = plr.Backpack:FindFirstChild('Punch')
@@ -823,9 +830,7 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
                         end
                     end
                 end
-
-                task.wait(0.5)
-            end
+            end)
         end
     end, 
     "AutoPunches SelectedPlayer"
@@ -983,5 +988,3 @@ end)
 local Menu = Lib.AddPage("Menu", "Show's Menu Tab")
 local Ui = Lib.AddPage("Ui", "Show's Ui Tab")
 local Info = Lib.AddPage("Info", "Show's Info Tab")
-
-print("test")
