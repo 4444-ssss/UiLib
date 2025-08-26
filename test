@@ -44,6 +44,8 @@ local Holder = Instance.new("Frame")
 local TabsButtonsHolder = Instance.new("ScrollingFrame")
 local UIGridLayoutTabs = Instance.new("UIGridLayout")
 local str = Instance.new("UIStroke")
+local Openbtn = Instance.new("TextButton")
+
 
 GUI.Name = "GUI"
 GUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -68,6 +70,39 @@ lbl.TextColor3 = Color3.fromRGB(218, 218, 218)
 lbl.TextSize = 25
 lbl.TextWrapped = true
 lbl.TextXAlignment = Enum.TextXAlignment.Left
+
+Openbtn.Name = "Openbtn"
+Openbtn.Parent = GUI
+Openbtn.Size = UDim2.new(0, 100, 0, 50)
+Openbtn.Position = UDim2.new(0.5, -50, 0.5, -25)
+Openbtn.Text = "Open Menu"
+Openbtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Openbtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+Openbtn.Font = Enum.Font.SourceSans
+Openbtn.TextSize = 18
+
+local function closeHolder()
+    Holder:TweenPosition(UDim2.new(0.5, -200, 0.5, -150), Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.25, true)
+    HolderPage:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.25, true)
+end
+
+local function openHolder()
+    Holder.Visible = true
+    HolderPage.Visible = true
+    Holder:TweenPosition(UDim2.new(0.5, -200, 0.5, -150), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.25, true)
+    HolderPage:TweenSize(UDim2.new(0, 400, 0, 244), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.25, true)
+end
+
+-- Openbtn click event with text change (Open/Close)
+Openbtn.MouseButton1Click:Connect(function()
+    if Holder.Visible then
+        closeHolder()
+        Openbtn.Text = "Open" -- Change text to "Open Menu" when closed
+    else
+        openHolder()
+        Openbtn.Text = "Close" -- Change text to "Close Menu" when opened
+    end
+end)
 
 local function respawn()
     pcall(function()
