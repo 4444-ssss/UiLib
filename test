@@ -643,6 +643,130 @@ coroutine.wrap(function()
 end)()
 
 
+local x6 = Tools:AddBox("SelectPlayer", "Type Player(s) Name or Display")
+x6.FocusLost:Connect(function()
+    local playerName = x6.Text
+    local player = findplr(playerName)
+    if player then
+        targets[player.UserId] = true
+        x6.Text = ''
+    end
+end)
+
+local t15 = Tools:AddToggle("AnvilKill", false, 
+    function(state) 
+        anvilKillToggle = state
+    end, 
+    "AnvilKills Target(s)"
+)
+
+local t16 = Tools:AddToggle("AnvilKillAll", false, 
+    function(state) 
+        anvilKillAllToggle = state
+        if state then
+            killAll = true
+            for _, p in pairs(plrs:GetPlayers()) do
+                if p ~= plr and not whitelist[p.UserId] then
+                    targets[p.UserId] = true
+                end
+            end
+        else
+            killAll = false
+            targets = {}
+        end
+    end, 
+    "AnvilKills All Players"
+)
+
+local t17 = Tools:AddToggle("AnvilOrbit", false, 
+    function(state) 
+        anvilOrbitToggle = state
+        if not state then
+            stopAnvils()
+        end
+    end, 
+    "Orbits Anvil When Thrown"
+)
+
+local t18 = Tools:AddToggle("FIingAnvils", false, 
+    function(state) 
+    end, 
+    "FIings All Anvils")
+
+local t19 = Tools:AddToggle("HideAnvil", false, 
+    function(state) 
+    end, 
+    "HidesAnvils")
+
+local anvilEnabled = false
+
+local function activateAnvil()
+    if anvilEnabled then
+        local c = 0
+        repeat
+            rs.RenderStepped:Wait()
+            c = c + 1
+        until (plr.Character
+            and plr.Character:FindFirstChild("HumanoidRootPart")
+            and plr:FindFirstChild("Backpack")
+            and plr.Backpack:FindFirstChild("Anvil"))
+            or c >= 200
+
+        if c < 200 then
+            local tool = plr.Backpack.Anvil
+            if not plr.Character:FindFirstChild("Anvil") then
+                tool.Parent = plr.Character
+                task.wait(0.1)
+                tool:Activate()
+                if plr.Character:FindFirstChild("Anvil") then
+                    while anvilEnabled do
+                        plr.Character.Anvil.send:FireServer(
+                            plr.Character.HumanoidRootPart.CFrame.p + Vector3.new(0, -10, 0)
+                        )
+                        task.wait(1)
+                        tool.Parent = plr.Backpack
+                        task.wait(30)
+                        if not anvilEnabled then break end
+                        tool.Parent = plr.Character
+                        task.wait(0.1)
+                        tool:Activate()
+                    end
+                end
+            end
+        end
+    end
+end
+
+local t20 = Tools:AddToggle("AutoThrow", false, 
+    function(state) 
+        anvilEnabled = state
+        if state then
+            if not plr.Character:FindFirstChild("Anvil") then
+                activateAnvil()
+            end
+        end
+    end, 
+    "AutoThrows Anvil")
+
+anvilConnection = plr.CharacterAdded:Connect(function()
+    if anvilEnabled and not plr.Character:FindFirstChild("Anvil") then
+        activateAnvil()
+    end
+end)
+
+if plr.Character then
+    if anvilEnabled and not plr.Character:FindFirstChild("Anvil") then
+        activateAnvil()
+    end
+end
+
+local b3 = Tools:AddButton("ClearSelected", 
+    function() 
+        targets = {}  
+    end, 
+    "Clears SelectedPlayer"
+)
+
 local b4 = Tools:AddButton("PunchSelected", 
     function() 
         local tool = plr.Backpack:FindFirstChild('Punch') or plr.Character:FindFirstChild('Punch')
