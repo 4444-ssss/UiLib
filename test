@@ -1,3 +1,13 @@
+local StarterGui = game:GetService("StarterGui")
+
+StarterGui:SetCore("SendNotification", {
+    Title = "Hello!";
+    Text = "This is your notification!";
+    Duration = 5; -- Time in seconds the notification stays
+    Button1 = "Ok";
+})
+
+
 local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("GUI")
 if FGUI then
     FGUI:Destroy()
