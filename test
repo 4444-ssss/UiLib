@@ -691,14 +691,13 @@ local t17 = Tools:AddToggle("AnvilOrbit", false,
 
 local t18 = Tools:AddToggle("FIingAnvils", false, 
     function(state) 
-        isEnabled = state  -- Set isEnabled based on toggle state
+        isEnabled = state
     end, 
     "Fires All Anvils")
 
-local isEnabled = false  -- Initially set to false
-local RunService = game:GetService("RunService")
+local isEnabled = false
 
-RunService.Heartbeat:Connect(function()
+rs.Heartbeat:Connect(function()
     if isEnabled then
         for _, v in pairs(game.Players:GetPlayers()) do
             if v ~= game.Players.LocalPlayer then
@@ -711,6 +710,7 @@ RunService.Heartbeat:Connect(function()
         end
     end
 end)
+
 
 
 local t19 = Tools:AddToggle("HideAnvil", false, 
