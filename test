@@ -2,10 +2,10 @@ local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("
 if FGUI then
     FGUI:Destroy()
 end
+repeat wait() until game.Loaded and game:GetService'Players'.LocalPlayer
 local wspace = game:GetService("Workspace")
 local rs = game:GetService('RunService')
 local plrs = game:GetService("Players")
-local char = plr.Character
 local plr = plrs.LocalPlayer
 local vim = game:GetService('VirtualInputManager')
 local ts = game:GetService('TweenService')
@@ -22,7 +22,6 @@ local Speed = 2.2
 local Height = 1.6
 workspace.FallenPartsDestroyHeight = 0/0
 local Velocity = -9e37
-
 local function findplr(Target)
     local player = plrs:FindFirstChild(Target)
     if player then
@@ -36,7 +35,6 @@ local function findplr(Target)
     end
     return nil
 end
-
 local GUI = Instance.new("ScreenGui")
 local Container = Instance.new("Frame")
 local lbl = Instance.new("TextLabel")
@@ -46,19 +44,16 @@ local Holder = Instance.new("Frame")
 local TabsButtonsHolder = Instance.new("ScrollingFrame")
 local UIGridLayoutTabs = Instance.new("UIGridLayout")
 local str = Instance.new("UIStroke")
-
 GUI.Name = "GUI"
 GUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 GUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 GUI.ResetOnSpawn = false
-
 Container.Name = "Container"
 Container.Parent = GUI
 Container.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 Container.BorderSizePixel = 0
 Container.Position = UDim2.new(0.11875, 0, 0.366828918, 0)
 Container.Size = UDim2.new(0, 401, 0, 22)
-
 lbl.Name = "lbl"
 lbl.Parent = Container
 lbl.BackgroundTransparency = 1
@@ -70,7 +65,6 @@ lbl.TextColor3 = Color3.fromRGB(218, 218, 218)
 lbl.TextSize = 25
 lbl.TextWrapped = true
 lbl.TextXAlignment = Enum.TextXAlignment.Left
-
 local function respawn()
     pcall(function()
         local b = plr.PlayerGui.DeathMenu.Frame.Button.TextButton
@@ -89,7 +83,6 @@ local function respawn()
         end)
     end)
 end
-
 local Refresh = Instance.new('TextButton', GUI)
 Refresh.Name = "Refresh"
 Refresh.AnchorPoint = Vector2.new(1, 0)
@@ -102,7 +95,6 @@ Refresh.TextColor3 = Color3.fromRGB(255, 255, 255)
 Refresh.TextScaled = true
 Refresh.TextSize = 14.000
 Refresh.TextWrapped = true
-
 local RespawnButton = Instance.new('TextButton', GUI)
 RespawnButton.Name = "Respawn"
 RespawnButton.AnchorPoint = Vector2.new(1, 0)
@@ -115,7 +107,6 @@ RespawnButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 RespawnButton.TextScaled = true
 RespawnButton.TextSize = 14.000
 RespawnButton.TextWrapped = true
-
 Refresh.MouseButton1Up:Connect(function()
     pcall(function()
         oldpos = plr.Character.HumanoidRootPart.CFrame
@@ -129,11 +120,9 @@ Refresh.MouseButton1Up:Connect(function()
         workspace.CurrentCamera.CFrame = camcf
     end)
 end)
-
 RespawnButton.MouseButton1Up:Connect(function()
     respawn()
 end)
-
 HolderPage.Name = "HolderPage"
 HolderPage.Parent = Container
 HolderPage.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -141,20 +130,17 @@ HolderPage.BackgroundTransparency = 0.3
 HolderPage.BorderSizePixel = 0
 HolderPage.Position = UDim2.new(0, 0, 0.981572926, 0)
 HolderPage.Size = UDim2.new(0, 401, 0, 244)
-
 Line.Name = "Line"
 Line.Parent = Container
 Line.BackgroundColor3 = Color3.fromRGB(253, 27, 7)
 Line.BorderSizePixel = 0
 Line.Position = UDim2.new(0, 0, 0.981571555, 0)
 Line.Size = UDim2.new(0, 401, 0, 1)
-
 Holder.Name = "Holder"
 Holder.Parent = GUI
 Holder.BackgroundTransparency = 1
 Holder.Position = UDim2.new(0, 0, 0.425938785, 0)
 Holder.Size = UDim2.new(0, 93, 0, 167)
-
 TabsButtonsHolder.Name = "TabsButtonsHolder"
 TabsButtonsHolder.Parent = Holder
 TabsButtonsHolder.Active = true
@@ -163,24 +149,20 @@ TabsButtonsHolder.BorderSizePixel = 0
 TabsButtonsHolder.Size = UDim2.new(0, 93, 0, 167)
 TabsButtonsHolder.ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0)
 TabsButtonsHolder.ScrollBarThickness = 0
-
 UIGridLayoutTabs.Parent = TabsButtonsHolder
 UIGridLayoutTabs.SortOrder = Enum.SortOrder.LayoutOrder
 UIGridLayoutTabs.CellPadding = UDim2.new(0, 0, 0, 0)
 UIGridLayoutTabs.CellSize = UDim2.new(0, 93, 0, 24)
-
 str.Name = "str"
 str.Parent = Holder
 str.Color = Color3.fromRGB(43, 43, 43)
 str.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
 local Lib = {}
 local pages = {}
 local currentPage = nil
 local baseText = lbl.Text
 local typingThread = nil
 local typingDelay = 0.02
-
 local function typeIntoLabel(text)
     if typingThread then task.cancel(typingThread) end
     typingThread = task.spawn(function()
@@ -191,7 +173,6 @@ local function typeIntoLabel(text)
         end
     end)
 end
-
 local function bindHover(guiObject, tipText)
     if not guiObject then return end
     if tipText and tipText ~= "" then
@@ -203,7 +184,6 @@ local function bindHover(guiObject, tipText)
         end)
     end
 end
-
 local function switchTo(pageName)
     for name, pg in pairs(pages) do
         pg.Frame.Visible = (name == pageName)
@@ -214,7 +194,6 @@ local function switchTo(pageName)
     currentPage = pages[pageName]
     typeIntoLabel(pageName)
 end
-
 function Lib.AddPage(name, hovertip)
     local PageFrame = Instance.new("Frame")
     PageFrame.Name = name
@@ -225,18 +204,15 @@ function Lib.AddPage(name, hovertip)
     PageFrame.Position = UDim2.new(0.017, 0, 0.029, 0)
     PageFrame.Size = UDim2.new(0, 387, 0, 203)
     PageFrame.Visible = false
-
     local grid = Instance.new("UIGridLayout")
     grid.Name = "Grid"
     grid.Parent = PageFrame
     grid.SortOrder = Enum.SortOrder.LayoutOrder
     grid.CellPadding = UDim2.new(0, 5, 0, 6)
     grid.CellSize = UDim2.new(0, 93, 0, 20)
-
     local pad = Instance.new("UIPadding")
     pad.Parent = PageFrame
     pad.PaddingBottom = UDim.new(0, 15)
-
     local TabButton = Instance.new("TextButton")
     TabButton.Name = "Tab_" .. name
     TabButton.Parent = TabsButtonsHolder
@@ -248,22 +224,17 @@ function Lib.AddPage(name, hovertip)
     TabButton.TextColor3 = Color3.fromRGB(180, 180, 180)
     TabButton.TextScaled = true
     TabButton.TextWrapped = true
-
     local stroke = Instance.new("UIStroke")
     stroke.Parent = TabButton
     stroke.Color = Color3.fromRGB(52, 52, 52)
     stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
     TabButton.MouseButton1Click:Connect(function()
         switchTo(name)
     end)
-
     bindHover(TabButton, hovertip or "")
-
     local pageApi = {}
     pageApi.Frame = PageFrame
     pageApi.Button = TabButton
-
     function pageApi:AddToggle(text, default, callback, hovertipText)
         local Toggle = Instance.new("TextButton")
         Toggle.Name = "Toggle_" .. text
@@ -276,12 +247,10 @@ function Lib.AddPage(name, hovertip)
         Toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
         Toggle.TextScaled = true
         Toggle.TextWrapped = true
-
         local UIStroke_3 = Instance.new("UIStroke")
         UIStroke_3.Parent = Toggle
         UIStroke_3.Color = Color3.fromRGB(52, 52, 52)
         UIStroke_3.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
         local check = Instance.new("Frame")
         check.Name = "check"
         check.Parent = Toggle
@@ -289,7 +258,6 @@ function Lib.AddPage(name, hovertip)
         check.BorderSizePixel = 0
         check.Position = UDim2.new(0, 0, 1, 0)
         check.Size = UDim2.new(0, 93, 0, 1)
-
         local state = default and true or false
         local function set(v)
             state = v and true or false
@@ -300,11 +268,9 @@ function Lib.AddPage(name, hovertip)
         Toggle.MouseButton1Click:Connect(function()
             set(not state)
         end)
-
         bindHover(Toggle, hovertipText or "")
         return { Set = set, Get = function() return state end, Instance = Toggle }
     end
-
     function pageApi:AddButton(text, callback, hovertipText)
         local Button = Instance.new("TextButton")
         Button.Name = "Button_" .. text
@@ -317,20 +283,16 @@ function Lib.AddPage(name, hovertip)
         Button.TextColor3 = Color3.fromRGB(255, 255, 255)
         Button.TextScaled = true
         Button.TextWrapped = true
-
         local UIStroke_2 = Instance.new("UIStroke")
         UIStroke_2.Parent = Button
         UIStroke_2.Color = Color3.fromRGB(43, 43, 43)
         UIStroke_2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
         Button.MouseButton1Click:Connect(function()
             if callback then task.spawn(callback) end
         end)
-
         bindHover(Button, hovertipText or "")
         return Button
     end
-
 function pageApi:AddBox(placeholderText, hovertipText)
     local Box = Instance.new("TextBox")
     Box.Name = "Box_" .. (placeholderText or "Input")
@@ -346,80 +308,61 @@ function pageApi:AddBox(placeholderText, hovertipText)
     Box.TextColor3 = Color3.fromRGB(107, 107, 107)
     Box.TextScaled = true
     Box.TextWrapped = true
-
     local UIStroke = Instance.new("UIStroke")
     UIStroke.Parent = Box
     UIStroke.Color = Color3.fromRGB(43, 43, 43)
     UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
     local baseText = lbl.Text
-
     Box.MouseEnter:Connect(function()
-        -- Animate hover tip text
         local hoverText = hovertipText or ("Input: " .. (Box.Text == "" and "(empty)" or Box.Text))
         typeIntoLabel(hoverText)
     end)
-
     Box.MouseLeave:Connect(function()
-
         typeIntoLabel(baseText)
     end)
-
     return Box
 end
-
     pages[name] = pageApi
     if not currentPage then switchTo(name) end
     return pageApi
 end
-
 local Main = Lib.AddPage("Main", "Show's Main Tab")
-
-local t1 = Main:AddToggle("AntiFIing", false, 
-    function(state) 
-    end, 
+local t1 = Main:AddToggle("AntiFIing", false,
+    function(state)
+    end,
     "Prevents from getting Flung")
-
-local t2 = Main:AddToggle("AntiRagdoll", false, 
-    function(state) 
-    end, 
+local t2 = Main:AddToggle("AntiRagdoll", false,
+    function(state)
+    end,
     "Prevents from Ragdolling")
-
-local t3 = Main:AddToggle("NoFallDamage", false, 
-    function(state) 
-    end, 
+local t3 = Main:AddToggle("NoFallDamage", false,
+    function(state)
+    end,
     "FallDamage Won't Effect")
-
-local t4 = Main:AddToggle("AntiSpinner", false, 
-    function(state) 
-    end, 
+local t4 = Main:AddToggle("AntiSpinner", false,
+    function(state)
+    end,
     "Activates/Deactivates AntiSpinner")
-
-local t5 = Main:AddToggle("AutoRespawn", false, 
-    function(state) 
-    end, 
+local t5 = Main:AddToggle("AutoRespawn", false,
+    function(state)
+    end,
     "AutoRespawns By its own")
-
-local t6 = Main:AddToggle("MovementHack", false, 
-    function(state) 
-    end, 
+local t6 = Main:AddToggle("MovementHack", false,
+    function(state)
+    end,
     "Activates MovementHack let's you fly")
-
-local t7 = Main:AddToggle("AntiVoid", false, 
-    function(state) 
-    end, 
+local t7 = Main:AddToggle("AntiVoid", false,
+    function(state)
+    end,
     "Prevents from Dying when fall to void")
-
-local t8 = Main:AddToggle("NoRagdollCD", false, 
-    function(state) 
-    end, 
+local t8 = Main:AddToggle("NoRagdollCD", false,
+    function(state)
+    end,
     "Deletes Ragdoll Cooldown")
-
-local t9 = Main:AddToggle("HiddenFIing", false, 
-    function(state) 
-    end, 
+local t9 = Main:AddToggle("HiddenFIing", false,
+    function(state)
+    end,
     "Makes your FIing/LoopFIing better")
-
 local x1 = Main:AddBox("FIing", "FIings Target")
 x1.FocusLost:Connect(function()
     pcall(function()
@@ -445,7 +388,6 @@ x1.FocusLost:Connect(function()
     end)
     x1.Text = ''
 end)
-
 local x2 = Main:AddBox("FIingV2", "FIingsV2 Target")
 x2.FocusLost:Connect(function()
     pcall(function()
@@ -456,7 +398,6 @@ x2.FocusLost:Connect(function()
     end)
     x2.Text = ''
 end)
-
 local x3 = Main:AddBox("LoopFIings", "LoopFIings Target")
 x3.FocusLost:Connect(function()
     local tar = findplr(x3.Text)
@@ -465,7 +406,6 @@ x3.FocusLost:Connect(function()
     end
     x3.Text = ''
 end)
-
 local x4 = Main:AddBox("LoopFIingV2", "LoopFIingsV2 Target")
 x4.FocusLost:Connect(function()
     local tar = findplr(x4.Text)
@@ -474,12 +414,10 @@ x4.FocusLost:Connect(function()
     end
     x4.Text = ''
 end)
-
 local b1 = Main:AddButton("ClearLoop", function()
     LoopFlingV1 = {}
     LoopFlingV2 = {}
 end, "Clears LoopFIings/FIings")
-
 spawn(function()
     while true do
         wait(0.1)
@@ -501,7 +439,6 @@ spawn(function()
                 end)
             end
         end
-
         for _, v in pairs(LoopFlingV2) do
             if v and v.Character then
                 pcall(function()
@@ -511,7 +448,6 @@ spawn(function()
         end
     end
 end)
-
 game:GetService('Players').PlayerAdded:Connect(function(player)
     player.CharacterAdded:Connect(function()
         if LoopFlingV1[player.Name] then
@@ -522,39 +458,31 @@ game:GetService('Players').PlayerAdded:Connect(function(player)
         end
     end)
 end)
-
-local t10 = Main:AddToggle("InfinitePunch", false, 
-    function(state) 
-    end, 
+local t10 = Main:AddToggle("InfinitePunch", false,
+    function(state)
+    end,
     "Gives InfinitePunch (E)")
-
-local t11 = Main:AddToggle("NoClip", false, 
-    function(state) 
-    end, 
+local t11 = Main:AddToggle("NoClip", false,
+    function(state)
+    end,
     "Gives you NoClip")
-
 local x5 = Main:AddBox("SpinFIing", "SpinFIings Target")
 x5.FocusLost:Connect(function()
 end)
-
-local t12 = Main:AddToggle("AutoPunch", false, 
-    function(state) 
-    end, 
+local t12 = Main:AddToggle("AutoPunch", false,
+    function(state)
+    end,
     "AutoPunches Players Automatically")
-
-local t13 = Main:AddToggle("SuperPunch", false, 
-    function(state) 
-    end, 
+local t13 = Main:AddToggle("SuperPunch", false,
+    function(state)
+    end,
     "Fake Punch And FIings (E)")
-
-local t14 = Main:AddToggle("Virus", false, 
-    function(state) 
-    end, 
+local t14 = Main:AddToggle("Virus", false,
+    function(state)
+    end,
     "TouchFIing FIings Players you Touch")
-
-local b2 = Main:AddButton("PermaGod", 
+local b2 = Main:AddButton("PermaGod",
     function()
-
         local function godmode(char)
             pcall(function()
                 for _,v in next,char:GetChildren() do
@@ -580,22 +508,17 @@ local b2 = Main:AddButton("PermaGod",
                 end
             end)
         end
-
         godmode(plr.Character)
         plr.CharacterAdded:Connect(function(char)
             repeat task.wait() until char:FindFirstChildOfClass("Humanoid")
             godmode(char)
         end)
-    end, 
+    end,
     "Gives PermaGod")
-
 local Tools = Lib.AddPage("Tools", "Show's Tools Tab")
-
-
 local anvilKillToggle = false
 local anvilKillAllToggle = false
 local anvilOrbitToggle = false
-
 local function addAnvil(anvil)
     table.insert(anvils, anvil)
     anvil.Parent = workspace
@@ -604,7 +527,6 @@ local function addAnvil(anvil)
     anvil.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0, 0, 0)
     anvil.Velocity = (anvil.Position - head.Position).unit * Velocity
 end
-
 local function FindAnvils()
     anvils = {}
     for _, v in pairs(workspace:GetChildren()) do
@@ -613,7 +535,6 @@ local function FindAnvils()
         end
     end
 end
-
 local function AnvilPosition()
     if #anvils == 0 then return end
     local Time = tick() * Speed
@@ -638,7 +559,6 @@ local function AnvilPosition()
         end
     end
 end
-
 local function stopAnvils()
     anvils = {}
     targets = {}
@@ -647,7 +567,6 @@ local function stopAnvils()
     anvilKillAllToggle = false
     anvilOrbitToggle = false
 end
-
 rs.Heartbeat:Connect(function()
     if anvilOrbitToggle then
         AnvilPosition()
@@ -655,28 +574,23 @@ rs.Heartbeat:Connect(function()
         stopAnvils()
     end
 end)
-
 local function CharacterAdded(Character)
     character = Character
     head = Character:WaitForChild("Head")
     FindAnvils()
 end
 plr.CharacterAdded:Connect(CharacterAdded)
-
 workspace.ChildAdded:Connect(function(child)
     if child:IsA("BasePart") and child.Name == "Anvil" then
         addAnvil(child)
     end
 end)
-
 coroutine.wrap(function()
     while true do
         FindAnvils()
         task.wait()
     end
 end)()
-
-
 local x6 = Tools:AddBox("SelectPlayer", "Type Player(s) Name or Display")
 x6.FocusLost:Connect(function()
     local playerName = x6.Text
@@ -686,16 +600,14 @@ x6.FocusLost:Connect(function()
         x6.Text = ''
     end
 end)
-
-local t15 = Tools:AddToggle("AnvilKill", false, 
-    function(state) 
+local t15 = Tools:AddToggle("AnvilKill", false,
+    function(state)
         anvilKillToggle = state
-    end, 
+    end,
     "AnvilKills Target(s)"
 )
-
-local t16 = Tools:AddToggle("AnvilKillAll", false, 
-    function(state) 
+local t16 = Tools:AddToggle("AnvilKillAll", false,
+    function(state)
         anvilKillAllToggle = state
         if state then
             killAll = true
@@ -708,33 +620,27 @@ local t16 = Tools:AddToggle("AnvilKillAll", false,
             killAll = false
             targets = {}
         end
-    end, 
+    end,
     "AnvilKills All Players"
 )
-
-local t17 = Tools:AddToggle("AnvilOrbit", false, 
-    function(state) 
+local t17 = Tools:AddToggle("AnvilOrbit", false,
+    function(state)
         anvilOrbitToggle = state
         if not state then
             stopAnvils()
         end
-    end, 
+    end,
     "Orbits Anvil When Thrown"
 )
-
-local t18 = Tools:AddToggle("FIingAnvils", false, 
-    function(state) 
-    end, 
+local t18 = Tools:AddToggle("FIingAnvils", false,
+    function(state)
+    end,
     "FIings All Anvils")
-
-
-local t19 = Tools:AddToggle("HideAnvil", false, 
-    function(state) 
-    end, 
+local t19 = Tools:AddToggle("HideAnvil", false,
+    function(state)
+    end,
     "HidesAnvils")
-
 local anvilEnabled = false
-
 local function activateAnvil()
     if anvilEnabled then
         local c = 0
@@ -746,7 +652,6 @@ local function activateAnvil()
             and plr:FindFirstChild("Backpack")
             and plr.Backpack:FindFirstChild("Anvil"))
             or c >= 200
-
         if c < 200 then
             local tool = plr.Backpack.Anvil
             if not plr.Character:FindFirstChild("Anvil") then
@@ -771,45 +676,38 @@ local function activateAnvil()
         end
     end
 end
-
-local t20 = Tools:AddToggle("AutoThrow", false, 
-    function(state) 
+local t20 = Tools:AddToggle("AutoThrow", false,
+    function(state)
         anvilEnabled = state
         if state then
             if not plr.Character:FindFirstChild("Anvil") then
                 activateAnvil()
             end
         end
-    end, 
+    end,
     "AutoThrows Anvil")
-
 anvilConnection = plr.CharacterAdded:Connect(function()
     if anvilEnabled and not plr.Character:FindFirstChild("Anvil") then
         activateAnvil()
     end
 end)
-
 if plr.Character then
     if anvilEnabled and not plr.Character:FindFirstChild("Anvil") then
         activateAnvil()
     end
 end
-
-local b3 = Tools:AddButton("ClearSelected", 
-    function() 
-        targets = {}  
-    end, 
+local b3 = Tools:AddButton("ClearSelected",
+    function()
+        targets = {}
+    end,
     "Clears SelectedPlayer"
 )
-
-local b4 = Tools:AddButton("PunchSelected", 
-    function() 
+local b4 = Tools:AddButton("PunchSelected",
+    function()
         local tool = plr.Backpack:FindFirstChild('Punch') or plr.Character:FindFirstChild('Punch')
         if not tool then return end
-
         tool.Parent = plr.Character
         tool:Activate()
-
         for _, targetId in pairs(targets) do
             local targetPlayer = game.Players:GetPlayerByUserId(targetId)
             if targetPlayer and targetPlayer.Character then
@@ -824,22 +722,19 @@ local b4 = Tools:AddButton("PunchSelected",
                 end
             end
         end
-    end, 
+    end,
     "Punches SelectedPlayer"
 )
-
-local t21 = Tools:AddToggle("AutoPunchSelected", false, 
+local t21 = Tools:AddToggle("AutoPunchSelected", false,
     function(state)
         local tool
         local connection
-
         if state then
             connection = rs.Heartbeat:Connect(function()
                 if not state then
                     connection:Disconnect()
                     return
                 end
-
                 tool = plr.Backpack:FindFirstChild('Punch') or plr.Character:FindFirstChild('Punch')
                 if not tool then
                     tool = plr.Backpack:FindFirstChild('Punch')
@@ -847,14 +742,11 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
                         tool.Parent = plr.Character
                     end
                 end
-
                 if tool and not plr.Character:FindFirstChild('Punch') then
                     tool.Parent = plr.Character
                 end
-
                 if tool then
                     tool:Activate()
-
                     for _, targetId in pairs(targets) do
                         local targetPlayer = game.Players:GetPlayerByUserId(targetId)
                         if targetPlayer and targetPlayer.Character then
@@ -872,37 +764,30 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
                 end
             end)
         else
-            -- When toggle is off, disconnect the connection and move the tool back to the backpack
             if connection then
                 connection:Disconnect()
             end
-
             tool = plr.Character:FindFirstChild('Punch')
             if tool then
                 tool.Parent = plr.Backpack
             end
         end
-    end, 
+    end,
     "AutoPunches SelectedPlayer"
 )
-
-
-local t22 = Tools:AddToggle("SpamBomb", false, 
-    function(state) 
+local t22 = Tools:AddToggle("SpamBomb", false,
+    function(state)
         if state then
             spawnBombSpam()
         else
             stopBombSpam()
         end
-    end, 
+    end,
     "SpamsBomb")
-
 local bombingActive = false
-
 function spawnBombSpam()
     bombingActive = true
     while bombingActive do
-        local plr = game.Players.LocalPlayer
         for _, v in next, plr.Backpack:GetChildren() do
             if v.Name == "Bomb" then
                 v.Parent = plr.Character
@@ -910,52 +795,41 @@ function spawnBombSpam()
                 respawn()
             end
         end
-        wait(0.1)  -- Reduced wait time to increase speed
+        wait(0.1)
     end
 end
-
 function stopBombSpam()
     bombingActive = false
 end
-
-local t23 = Tools:AddToggle("BombFIingSelected", false, 
-    function(state) 
-    end, 
+local t23 = Tools:AddToggle("BombFIingSelected", false,
+    function(state)
+    end,
     "BombFIings SelectedPlayer")
-
 local Global = Lib.AddPage("Global", "Show's Global Tab")
-
-local t24 = Global:AddToggle("BreakMap", false, 
-    function(state) 
-    end, 
+local t24 = Global:AddToggle("BreakMap", false,
+    function(state)
+    end,
     "Breaks the Map")
-
-local t25 = Global:AddToggle("LagServer", false, 
-    function(state) 
-    end, 
+local t25 = Global:AddToggle("LagServer", false,
+    function(state)
+    end,
     "Lags The Whole Server")
-
-local t26 = Global:AddToggle("DamageSound", false, 
-    function(state) 
-    end, 
+local t26 = Global:AddToggle("DamageSound", false,
+    function(state)
+    end,
     "Annoys Player(s) With the Loud Sound")
-
-local t27 = Global:AddToggle("FIingMapItems", false, 
-    function(state) 
-    end, 
+local t27 = Global:AddToggle("FIingMapItems", false,
+    function(state)
+    end,
     "FIings All UnAnchored Items")
-
-local t28 = Global:AddToggle("BugMap", false, 
-    function(state) 
-    end, 
+local t28 = Global:AddToggle("BugMap", false,
+    function(state)
+    end,
     "BugsMap People Will Fall")
-
 local Misc = Lib.AddPage("Misc", "Show's Misc Tab")
-
-local b5 = Misc:AddButton("Big Jacket", 
-    function() 
+local b5 = Misc:AddButton("Big Jacket",
+    function()
         pcall(function()
-
             for _,v in next,char:GetChildren() do
                 if v:IsA'BasePart' and v.Name~='HumanoidRootPart' then
                     v.Massless = true
@@ -976,12 +850,11 @@ local b5 = Misc:AddButton("Big Jacket",
             char.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
             char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame+Vector3.new(0,5,0)
         end)
-    end, 
+    end,
     "Must Have Layered (Clothing, Jacket,)"
 )
-
-local b6 = Misc:AddButton("Legs Fling", 
-    function() 
+local b6 = Misc:AddButton("Legs Fling",
+    function()
         pcall(function()
             for _,v in next,plr.Character:GetChildren() do
                 if v:IsA'BasePart' and v.Name~='HumanoidRootPart' then
@@ -993,11 +866,10 @@ local b6 = Misc:AddButton("Legs Fling",
             end)
             plr.Character.HeadWaist:FireServer(CFrame.new(0,9e37,-9e37),CFrame.new(0,-9e37,9e37))
         end)
-    end, 
+    end,
     "Deletes your Torso and Flings People when Touch"
 )
-
-local t29 = Misc:AddToggle("BetterAnvil", false, 
+local t29 = Misc:AddToggle("BetterAnvil", false,
     function(state)
         if state then
             local function updateAnvilVelocity()
@@ -1009,27 +881,22 @@ local t29 = Misc:AddToggle("BetterAnvil", false,
             end
             updateAnvilVelocity()
         end
-    end, 
+    end,
     "Makes your Anvil Better And Stronger")
-
-
-local t30 = Misc:AddToggle("Invisible", false, 
-    function(state) 
-    end, 
+local t30 = Misc:AddToggle("Invisible", false,
+    function(state)
+    end,
     "Makes you Invisible")
-
-local t31 = Misc:AddToggle("PickViewer", false, 
-    function(state) 
-    end, 
+local t31 = Misc:AddToggle("PickViewer", false,
+    function(state)
+    end,
     "Show's you Player(s) Picks")
-
-local t32 = Misc:AddToggle("AutoSword", false, 
-    function(state) 
-    end, 
+local t32 = Misc:AddToggle("AutoSword", false,
+    function(state)
+    end,
     "Auto Get's the Sword")
-
-local t33 = Misc:AddToggle("AutoFarm", false, 
-    function(state) 
+local t33 = Misc:AddToggle("AutoFarm", false,
+    function(state)
         if state then
             while true do
                 pcall(function()
@@ -1055,11 +922,10 @@ local t33 = Misc:AddToggle("AutoFarm", false,
                 end)
             end
         end
-    end, 
+    end,
     "AutoFarm's Points"
 )
-
-local t34 = Misc:AddToggle("LowPing", false, 
+local t34 = Misc:AddToggle("LowPing", false,
     function(state)
         if state then
             plr.Character.BodyFollowMouse.Disabled = true
@@ -1068,26 +934,21 @@ local t34 = Misc:AddToggle("LowPing", false,
             plr.Character.BodyFollowMouse.Disabled = false
             plr.Character.HeadWaist:FireServer(CFrame.new(0,0,9e37), CFrame.new(0,0,-9e37))
         end
-    end, 
+    end,
     "Boost Internet and Lowers Ping")
-
-local t35 = Misc:AddToggle("AntiV2All", false, 
-    function(state) 
-    end, 
+local t35 = Misc:AddToggle("AntiV2All", false,
+    function(state)
+    end,
     "Gives Everyone AntiFIingV2")
-
 local isEnabled = false
-
 local t36 = Misc:AddToggle("AntiAnvil", false, function(state)
     isEnabled = state
 end, "Fling Anvils")
-
 local antianvilconn
 antianvilconn = rs.Heartbeat:Connect(function()
     if not isEnabled then
         return
     end
-
     for _, v in pairs(game.Players:GetPlayers()) do
         if v ~= game.Players.LocalPlayer then
             pcall(function()
@@ -1098,14 +959,8 @@ antianvilconn = rs.Heartbeat:Connect(function()
         end
     end
 end)
-
-repeat wait() until game.Loaded and game:GetService'Players'.LocalPlayer
-local plrs = game:GetService'Players'
-local plr = plrs.LocalPlayer
-local rs = game:GetService'RunService'
-
-local b7 = Misc:AddButton("Spawn", 
-    function() 
+local b7 = Misc:AddButton("Spawn",
+    function()
         pcall(function()
             for _,v in next,workspace.Map:GetDescendants() do
                 if v:IsA'SpawnLocation' then
@@ -1113,12 +968,11 @@ local b7 = Misc:AddButton("Spawn",
                 end
             end
         end)
-    end, 
+    end,
     "Teleports to Spawn"
 )
-
-local b8 = Misc:AddButton("SafeZone", 
-    function() 
+local b8 = Misc:AddButton("SafeZone",
+    function()
         pcall(function()
             local safeZonePart = Instance.new("Part")
             safeZonePart.Name = "SafeZone"
@@ -1126,67 +980,52 @@ local b8 = Misc:AddButton("SafeZone",
             safeZonePart.Position = Vector3.new(1000, 50, 1000)
             safeZonePart.Anchored = true
             safeZonePart.Parent = workspace
-            
             plr.Character.HumanoidRootPart.CFrame = CFrame.new(1000, 51, 1000)
         end)
-    end, 
+    end,
     "Teleports To SafeZone"
 )
-
-
-local t37 = Misc:AddToggle("ToolController", false, 
-    function(state) 
-    end, 
+local t37 = Misc:AddToggle("ToolController", false,
+    function(state)
+    end,
     "Hold a Tool and turn it on Morphs into a Tool")
-
 local x7 = Misc:AddBox("SelectTarget", "SelectTarget(s) Name or Display")
 x7.FocusLost:Connect(function()
 end)
-
-local t38 = Misc:AddToggle("HatFIingTarget", false, 
-    function(state) 
-    end, 
+local t38 = Misc:AddToggle("HatFIingTarget", false,
+    function(state)
+    end,
     "FIings SelectedTarget with Your Hats")
-
-local b9 = Misc:AddButton("BugTargetscreen", 
-    function() 
-    end, 
+local b9 = Misc:AddButton("BugTargetscreen",
+    function()
+    end,
     "Bugs the Target Screen (Must Have Sword)")
-
-local b8 = Misc:AddButton("SwordFIingTarget", 
-    function() 
-    end, 
+local b8 = Misc:AddButton("SwordFIingTarget",
+    function()
+    end,
     "SwordFIings Target (Must Have Sword)")
-
 local Keybinds = Lib.AddPage("Keybinds", "Show's Keybinds Tab")
-
 local AutoPickKey = "e"
 local FlingKey = "f"
 local FlingV2Key = "g"
 local ViewKey = "m"
-
 local viewingPlayer = nil
-
 local x8 = Keybinds:AddBox("Fling", "Type any Letter to Change Bind")
 x8.FocusLost:Connect(function()
     FlingKey = x8.Text:lower()
 end)
-
 local x9 = Keybinds:AddBox("FlingV2", "Type any Letter to Change Bind")
 x9.FocusLost:Connect(function()
     FlingV2Key = x9.Text:lower()
 end)
-
 local x10 = Keybinds:AddBox("AutoPick", "Type any Letter to Change Bind")
 x10.FocusLost:Connect(function()
     AutoPickKey = x10.Text:lower()
 end)
-
 local x11 = Keybinds:AddBox("View", "Type any Letter to Change Bind")
 x11.FocusLost:Connect(function()
     ViewKey = x11.Text:lower()
 end)
-
 mouse.KeyDown:Connect(function(key)
     if key:lower() == FlingKey then
         pcall(function()
@@ -1228,15 +1067,12 @@ mouse.KeyDown:Connect(function(key)
         end)
     end
 end)
-
 local x12 = Keybinds:AddBox("HatFIing", "Type any Letter to Change Bind")
 x12.FocusLost:Connect(function()
 end)
-
 local x13 = Keybinds:AddBox("SpinFIing", "Type any Letter to Change Bind")
 x13.FocusLost:Connect(function()
 end)
-
 local Menu = Lib.AddPage("Menu", "Show's Menu Tab")
 local Ui = Lib.AddPage("Ui", "Show's Ui Tab")
 local Info = Lib.AddPage("Info", "Show's Info Tab")
