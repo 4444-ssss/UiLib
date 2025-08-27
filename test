@@ -5,6 +5,7 @@ end
 local wspace = game:GetService("Workspace")
 local rs = game:GetService('RunService')
 local plrs = game:GetService("Players")
+local char = plr.Character
 local plr = plrs.LocalPlayer
 local vim = game:GetService('VirtualInputManager')
 local ts = game:GetService('TweenService')
@@ -552,7 +553,39 @@ local t14 = Main:AddToggle("Virus", false,
     "TouchFIing FIings Players you Touch")
 
 local b2 = Main:AddButton("PermaGod", 
-    function() 
+    function()
+
+        local function godmode(char)
+            pcall(function()
+                for _,v in next,char:GetChildren() do
+                    if v.Name == "VelocityDamage" or v.Name == "GetPicked" or v.Name == "ArmAngleUpdate" then
+                        v:Destroy()
+                    end
+                end
+            end)
+            pcall(function()
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    local cl = hum:Clone()
+                    cl.Parent = char
+                    hum.Parent = nil
+                    cl:GetPropertyChangedSignal("Health"):Connect(function()
+                        if cl.Health <= 0 then
+                            hum.Parent = char
+                            task.wait(1)
+                            hum:Destroy()
+                        end
+                    end)
+                    workspace.CurrentCamera.CameraSubject = char
+                end
+            end)
+        end
+
+        godmode(plr.Character)
+        plr.CharacterAdded:Connect(function(char)
+            repeat task.wait() until char:FindFirstChildOfClass("Humanoid")
+            godmode(char)
+        end)
     end, 
     "Gives PermaGod")
 
@@ -691,26 +724,8 @@ local t17 = Tools:AddToggle("AnvilOrbit", false,
 
 local t18 = Tools:AddToggle("FIingAnvils", false, 
     function(state) 
-        isEnabled = state
     end, 
-    "Fires All Anvils")
-
-local isEnabled = false
-
-rs.Heartbeat:Connect(function()
-    if isEnabled then
-        for _, v in pairs(game.Players:GetPlayers()) do
-            if v ~= game.Players.LocalPlayer then
-                pcall(function()
-                    if v.Character and v.Character:FindFirstChild("Anvil") then
-                        v.Character.Anvil.send:FireServer(CFrame.new(math.huge, -math.huge, math.huge))
-                    end
-                end)
-            end
-        end
-    end
-end)
-
+    "FIings All Anvils")
 
 
 local t19 = Tools:AddToggle("HideAnvil", false, 
@@ -939,18 +954,64 @@ local Misc = Lib.AddPage("Misc", "Show's Misc Tab")
 
 local b5 = Misc:AddButton("Big Jacket", 
     function() 
-    end, 
-    "Must Have Layered (Clothing, Jacket,)")
+        pcall(function()
 
-local b6 = Misc:AddButton("Legs FIing", 
-    function() 
+            for _,v in next,char:GetChildren() do
+                if v:IsA'BasePart' and v.Name~='HumanoidRootPart' then
+                    v.Massless = true
+                end
+            end
+            pcall(function()
+                char.BodyFollowMouse.Disabled = true
+            end)
+            char.RagdollEvent:FireServer()
+            wait()
+            char.HeadWaist:FireServer(CFrame.new(0,0,9e37),CFrame.new(0,0,9e37))
+            wait()
+            char.HeadWaist:FireServer(CFrame.new(0,0,-9e37),CFrame.new(0,0,-9e37))
+            wait()
+            char.GetUpEvent:FireServer()
+            wait()
+            char.HeadWaist:FireServer(CFrame.new(0,0.8,0),CFrame.new(0,0.2,0))
+            char.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+            char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame+Vector3.new(0,5,0)
+        end)
     end, 
-    "Deletes your Torso and FIings People when Touch")
+    "Must Have Layered (Clothing, Jacket,)"
+)
+
+local b6 = Misc:AddButton("Legs Fling", 
+    function() 
+        pcall(function()
+            for _,v in next,plr.Character:GetChildren() do
+                if v:IsA'BasePart' and v.Name~='HumanoidRootPart' then
+                    v.Massless = true
+                end
+            end
+            pcall(function()
+                plr.Character.BodyFollowMouse.Disabled = true
+            end)
+            plr.Character.HeadWaist:FireServer(CFrame.new(0,9e37,-9e37),CFrame.new(0,-9e37,9e37))
+        end)
+    end, 
+    "Deletes your Torso and Flings People when Touch"
+)
 
 local t29 = Misc:AddToggle("BetterAnvil", false, 
-    function(state) 
+    function(state)
+        if state then
+            local function updateAnvilVelocity()
+                for _, v in pairs(workspace:GetChildren()) do
+                    if v:IsA("BasePart") and v.Name == 'Anvil' and v:FindFirstChild('Script') and v.Script:FindFirstChild('Value') and v.Script.Value.Value == plr then
+                        v.Velocity = -9e38
+                    end
+                end
+            end
+            updateAnvilVelocity()
+        end
     end, 
     "Makes your Anvil Better And Stronger")
+
 
 local t30 = Misc:AddToggle("Invisible", false, 
     function(state) 
@@ -969,11 +1030,44 @@ local t32 = Misc:AddToggle("AutoSword", false,
 
 local t33 = Misc:AddToggle("AutoFarm", false, 
     function(state) 
+        if state then
+            while true do
+                pcall(function()
+                    local char = plr.Character
+                    repeat wait() until plr.PlayerGui.DeathMenu.Frame.Button:FindFirstChild'TextButton' and char:FindFirstChild'HumanoidRootPart' and (plr.Backpack:FindFirstChild'Punch' or char:FindFirstChild'Punch')
+                    local tool = plr.Backpack:FindFirstChild'Punch' or plr.Character:FindFirstChild'Punch'
+                    tool.Parent = plr.Character
+                    tool:Activate()
+                    plr.Character.RagdollEvent:FireServer()
+                    wait(0.1)
+                    firetouchinterest(char.RightHand,char.HumanoidRootPart,0)
+                    firetouchinterest(char.RightHand,char.HumanoidRootPart,1)
+                    respawn()
+                    spawn(function()
+                        pcall(function()
+                            wait(0.1)
+                            if char then
+                                repeat respawn() wait(0.1) until not char or not char.Parent
+                            end
+                        end)
+                    end)
+                    plr.CharacterAdded:wait()
+                end)
+            end
+        end
     end, 
-    "AutoFarm's Points")
+    "AutoFarm's Points"
+)
 
 local t34 = Misc:AddToggle("LowPing", false, 
-    function(state) 
+    function(state)
+        if state then
+            plr.Character.BodyFollowMouse.Disabled = true
+            plr.Character.HeadWaist:FireServer(CFrame.new(0,0.8,0), CFrame.new(0,0.2,0))
+        else
+            plr.Character.BodyFollowMouse.Disabled = false
+            plr.Character.HeadWaist:FireServer(CFrame.new(0,0,9e37), CFrame.new(0,0,-9e37))
+        end
     end, 
     "Boost Internet and Lowers Ping")
 
@@ -982,20 +1076,63 @@ local t35 = Misc:AddToggle("AntiV2All", false,
     end, 
     "Gives Everyone AntiFIingV2")
 
-local t36 = Misc:AddToggle("AntiAnvil", false, 
-    function(state) 
-    end, 
-    "FIings Anvils")
+local isEnabled = false
+
+local t36 = Misc:AddToggle("AntiAnvil", false, function(state)
+    isEnabled = state
+end, "Fling Anvils")
+
+local antianvilconn
+antianvilconn = rs.Heartbeat:Connect(function()
+    if not isEnabled then
+        return
+    end
+
+    for _, v in pairs(game.Players:GetPlayers()) do
+        if v ~= game.Players.LocalPlayer then
+            pcall(function()
+                if v.Character and v.Character:FindFirstChild("Anvil") then
+                    v.Character.Anvil.send:FireServer(CFrame.new(-9e38, -9e38, -9e38))
+                end
+            end)
+        end
+    end
+end)
+
+repeat wait() until game.Loaded and game:GetService'Players'.LocalPlayer
+local plrs = game:GetService'Players'
+local plr = plrs.LocalPlayer
+local rs = game:GetService'RunService'
 
 local b7 = Misc:AddButton("Spawn", 
     function() 
+        pcall(function()
+            for _,v in next,workspace.Map:GetDescendants() do
+                if v:IsA'SpawnLocation' then
+                    plr.Character.HumanoidRootPart.CFrame = v.CFrame*CFrame.new(0,5,0)
+                end
+            end
+        end)
     end, 
-    "Teleports to Spawn")
+    "Teleports to Spawn"
+)
 
 local b8 = Misc:AddButton("SafeZone", 
     function() 
+        pcall(function()
+            local safeZonePart = Instance.new("Part")
+            safeZonePart.Name = "SafeZone"
+            safeZonePart.Size = Vector3.new(500, 3, 500)
+            safeZonePart.Position = Vector3.new(1000, 50, 1000)
+            safeZonePart.Anchored = true
+            safeZonePart.Parent = workspace
+            
+            plr.Character.HumanoidRootPart.CFrame = CFrame.new(1000, 51, 1000)
+        end)
     end, 
-    "Teleports To SafeZone")
+    "Teleports To SafeZone"
+)
+
 
 local t37 = Misc:AddToggle("ToolController", false, 
     function(state) 
@@ -1023,20 +1160,73 @@ local b8 = Misc:AddButton("SwordFIingTarget",
 
 local Keybinds = Lib.AddPage("Keybinds", "Show's Keybinds Tab")
 
-local x8 = Keybinds:AddBox("FIing", "Type any Letter to Change Bind")
+local AutoPickKey = "e"
+local FlingKey = "f"
+local FlingV2Key = "g"
+local ViewKey = "m"
+
+local viewingPlayer = nil
+
+local x8 = Keybinds:AddBox("Fling", "Type any Letter to Change Bind")
 x8.FocusLost:Connect(function()
+    FlingKey = x8.Text:lower()
 end)
 
-local x9 = Keybinds:AddBox("FIingV2", "Type any Letter to Change Bind")
+local x9 = Keybinds:AddBox("FlingV2", "Type any Letter to Change Bind")
 x9.FocusLost:Connect(function()
+    FlingV2Key = x9.Text:lower()
 end)
 
 local x10 = Keybinds:AddBox("AutoPick", "Type any Letter to Change Bind")
 x10.FocusLost:Connect(function()
+    AutoPickKey = x10.Text:lower()
 end)
 
 local x11 = Keybinds:AddBox("View", "Type any Letter to Change Bind")
 x11.FocusLost:Connect(function()
+    ViewKey = x11.Text:lower()
+end)
+
+mouse.KeyDown:Connect(function(key)
+    if key:lower() == FlingKey then
+        pcall(function()
+            if plr.Character.Picked.Value then
+                plr.Character.PuttingDown:FireServer()
+            end
+            plr.Character.Picking:FireServer(mouse.Target, Vector3.new(math.huge,-math.huge,math.huge))
+            wait(0.1)
+            plr.Character.PuttingDown:FireServer()
+        end)
+    elseif key:lower() == FlingV2Key then
+        pcall(function()
+            if mouse.Target:FindFirstAncestorOfClass('Model') and mouse.Target:FindFirstAncestorOfClass('Model'):FindFirstChild('ArmAngleChange') then
+                mouse.Target:FindFirstAncestorOfClass('Model').ArmAngleChange:FireServer(CFrame.new(math.huge, math.huge, math.huge))
+           end
+        end)
+    elseif key:lower() == AutoPickKey then
+        pcall(function()
+            if not plr.Character.Picked.Value then
+                plr.Character.Picking:FireServer(mouse.Target, mouse.Hit.p)
+            else
+                plr.Character.PuttingDown:FireServer()
+            end
+        end)
+    elseif key:lower() == ViewKey then
+        if viewingPlayer then
+            workspace.CurrentCamera.CameraSubject = plr.Character
+            viewingPlayer = nil
+        else
+            local target = mouse.Target and mouse.Target.Parent
+            if target and target.Parent and target.Parent:FindFirstChild("HumanoidRootPart") then
+                viewingPlayer = target.Parent
+                workspace.CurrentCamera.CameraSubject = viewingPlayer
+            end
+        end
+    elseif key == " " then
+        pcall(function()
+            plr.Character:FindFirstChildOfClass('Humanoid').Jump = true
+        end)
+    end
 end)
 
 local x12 = Keybinds:AddBox("HatFIing", "Type any Letter to Change Bind")
