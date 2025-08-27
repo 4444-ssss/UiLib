@@ -691,8 +691,27 @@ local t17 = Tools:AddToggle("AnvilOrbit", false,
 
 local t18 = Tools:AddToggle("FIingAnvils", false, 
     function(state) 
+        isEnabled = state  -- Set isEnabled based on toggle state
     end, 
-    "FIings All Anvils")
+    "Fires All Anvils")
+
+local isEnabled = false  -- Initially set to false
+local RunService = game:GetService("RunService")
+
+RunService.Heartbeat:Connect(function()
+    if isEnabled then
+        for _, v in pairs(game.Players:GetPlayers()) do
+            if v ~= game.Players.LocalPlayer then
+                pcall(function()
+                    if v.Character and v.Character:FindFirstChild("Anvil") then
+                        v.Character.Anvil.send:FireServer(CFrame.new(math.huge, -math.huge, math.huge))
+                    end
+                end)
+            end
+        end
+    end
+end)
+
 
 local t19 = Tools:AddToggle("HideAnvil", false, 
     function(state) 
@@ -886,63 +905,8 @@ end
 
 local t23 = Tools:AddToggle("BombFIingSelected", false, 
     function(state) 
-        if state then
-            startBombFling()
-        else
-            stopBombFling()
-        end
     end, 
-    "BombFIings SelectedPlayer"
-)
-
-local bombingActive = false
-
-function startBombFling()
-    bombingActive = true
-    spawn(function()
-        while bombingActive do
-            for userId, _ in pairs(targets) do
-                local targetPlayer = game.Players:GetPlayerByUserId(userId)
-                if targetPlayer and targetPlayer.Character then
-                    local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-                    if targetHRP then
-                        local targetTorso = targetPlayer.Character:FindFirstChild("UpperTorso") or targetPlayer.Character:FindFirstChild("Torso")
-                        if targetTorso then
-                            local part = Instance.new("Part")
-                            part.Size = Vector3.new(0.5, 0.5, 0.5)
-                            part.CanCollide = true
-                            part.Anchored = true
-                            part.Parent = wspace
-                            part.Name = "BombFlingPart"
-
-                            local handle = wspace:FindFirstChild("Handle")
-                            if handle then
-                                while bombingActive do
-                                    if part and part.Parent then
-                                        part.Position = targetHRP.Position  -- Keep updating the part's position to target HRP's position
-                                        handle.CFrame = part.CFrame
-                                        handle.Velocity = -9e38
-                                    end
-                                    if (handle.Position - part.Position).Magnitude < 2 then
-                                        part:Destroy()
-                                        break
-                                    end
-                                    wait(0.1)
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-            wait(0.1)
-        end
-    end)
-end
-
-function stopBombFling()
-    bombingActive = false
-end
-
+    "BombFIings SelectedPlayer")
 
 local Global = Lib.AddPage("Global", "Show's Global Tab")
 
