@@ -1017,8 +1017,52 @@ local t29 = Misc:AddToggle("BetterAnvil", false,
 
 local t30 = Misc:AddToggle("Invisible", false, 
     function(state) 
+        if not character or not character:FindFirstChild("HumanoidRootPart") then
+            return
+        end
+
+        if state then
+            local position = character.HumanoidRootPart.Position
+            character:MoveTo(position + Vector3.new(0, 1000000, 0))
+            wait(0.1)
+
+            local humanoidRootPartClone = character.HumanoidRootPart:Clone()
+            wait(0.1)
+            character.HumanoidRootPart:Destroy()
+            humanoidRootPartClone.Parent = character
+            character:MoveTo(position)
+            wait()
+
+            for _, part in pairs(character:GetChildren()) do
+                if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                    part.Transparency = 0.5
+                    part.CanCollide = false
+                end
+            end
+
+            if character:FindFirstChild("Humanoid") then
+                character.Humanoid:RemoveAccessories()
+            end
+            if character.Head:FindFirstChild("face") then
+                character.Head.face:Destroy()
+            end
+        else
+            for _, part in pairs(character:GetChildren()) do
+                if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                    part.Transparency = 0
+                    part.CanCollide = true
+                end
+            end
+
+            if character:FindFirstChild("Humanoid") then
+                for _, accessory in pairs(character.Humanoid:GetAccessories()) do
+                    accessory.Parent = character
+                end
+            end
+        end
     end, 
-    "Makes you Invisible")
+    "Makes you Invisible"
+)
 
 local t31 = Misc:AddToggle("PickViewer", false, 
     function(state) 
@@ -1033,34 +1077,40 @@ local t32 = Misc:AddToggle("AutoSword", false,
 local t33 = Misc:AddToggle("AutoFarm", false, 
     function(state) 
         if state then
-            while true do
-                pcall(function()
-                    local char = plr.Character
-                    repeat wait() until plr.PlayerGui.DeathMenu.Frame.Button:FindFirstChild'TextButton' and char:FindFirstChild'HumanoidRootPart' and (plr.Backpack:FindFirstChild'Punch' or char:FindFirstChild'Punch')
-                    local tool = plr.Backpack:FindFirstChild'Punch' or plr.Character:FindFirstChild'Punch'
-                    tool.Parent = plr.Character
-                    tool:Activate()
-                    plr.Character.RagdollEvent:FireServer()
-                    wait(0.1)
-                    firetouchinterest(char.RightHand,char.HumanoidRootPart,0)
-                    firetouchinterest(char.RightHand,char.HumanoidRootPart,1)
-                    respawn()
-                    spawn(function()
-                        pcall(function()
-                            wait(0.1)
-                            if char then
-                                repeat respawn() wait(0.1) until not char or not char.Parent
-                            end
+            local function startAutoFarm()
+                while state do
+                    pcall(function()
+                        local char = plr.Character
+                        repeat wait() until plr.PlayerGui.DeathMenu.Frame.Button:FindFirstChild'TextButton' and char:FindFirstChild'HumanoidRootPart' and (plr.Backpack:FindFirstChild'Punch' or char:FindFirstChild'Punch')
+                        local tool = plr.Backpack:FindFirstChild'Punch' or plr.Character:FindFirstChild'Punch'
+                        tool.Parent = plr.Character
+                        tool:Activate()
+                        plr.Character.RagdollEvent:FireServer()
+                        wait(0.1)
+                        firetouchinterest(char.RightHand, char.HumanoidRootPart, 0)
+                        firetouchinterest(char.RightHand, char.HumanoidRootPart, 1)
+                        respawn()
+                        spawn(function()
+                            pcall(function()
+                                wait(0.1)
+                                if char then
+                                    repeat respawn() wait(0.1) until not char or not char.Parent
+                                end
+                            end)
                         end)
+                        plr.CharacterAdded:wait()
                     end)
-                    plr.CharacterAdded:wait()
-                end)
+                end
             end
+
+            startAutoFarm()
+
+        else
+            state = false
         end
     end, 
     "AutoFarm's Points"
 )
-
 local t34 = Misc:AddToggle("LowPing", false, 
     function(state)
         if state then
