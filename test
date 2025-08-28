@@ -1,3 +1,6 @@
+-- ? 1k?
+
+
 local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("GUI")
 if FGUI then
     FGUI:Destroy()
@@ -492,75 +495,9 @@ local t5 = Main:AddToggle("AutoRespawn", false,
 
 local t6 = Main:AddToggle("MovementHack", false, 
     function(state) 
-        if state then
-            local hm = character:WaitForChild("Humanoid")
-            local bodyVelocity = Instance.new("BodyVelocity")
-            bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
-            bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-            bodyVelocity.Parent = character:WaitForChild("HumanoidRootPart")
-
-            local userInputService = game:GetService("UserInputService")
-            local flying = true
-            local movementSpeed = 50
-
-            userInputService.InputBegan:Connect(function(input)
-                if flying then
-                    if input.KeyCode == Enum.KeyCode.W then
-                        bodyVelocity.Velocity = Vector3.new(0, 0, -movementSpeed)
-                    elseif input.KeyCode == Enum.KeyCode.S then
-                        bodyVelocity.Velocity = Vector3.new(0, 0, movementSpeed)
-                    elseif input.KeyCode == Enum.KeyCode.A then
-                        bodyVelocity.Velocity = Vector3.new(-movementSpeed, 0, 0)
-                    elseif input.KeyCode == Enum.KeyCode.D then
-                        bodyVelocity.Velocity = Vector3.new(movementSpeed, 0, 0)
-                    elseif input.KeyCode == Enum.KeyCode.Space then
-                        bodyVelocity.Velocity = Vector3.new(0, movementSpeed, 0)
-                    elseif input.KeyCode == Enum.KeyCode.LeftControl then
-                        bodyVelocity.Velocity = Vector3.new(0, -movementSpeed, 0)
-                    end
-                end
-            end)
-
-            local touchStart = nil
-            local initialTouchPosition = nil
-
-            userInputService.TouchStarted:Connect(function(touch)
-                if flying then
-                    touchStart = touch
-                    initialTouchPosition = touch.Position
-                end
-            end)
-
-            userInputService.TouchMoved:Connect(function(touch)
-                if flying and touchStart and touch == touchStart then
-                    local delta = touch.Position - initialTouchPosition
-                    local moveX = delta.X * 0.1
-                    local moveY = delta.Y * 0.1
-                    bodyVelocity.Velocity = Vector3.new(moveX, moveY, 0)
-                end
-            end)
-
-            userInputService.TouchEnded:Connect(function(touch)
-                if touch == touchStart then
-                    touchStart = nil
-                    initialTouchPosition = nil
-                    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-                end
-            end)
-
-        else
-            local plr = game.Players.LocalPlayer
-            local character = plr.Character or plr.CharacterAdded:Wait()
-            local hm = character:WaitForChild("Humanoid")
-            local bodyVelocity = character:FindFirstChild("BodyVelocity")
-            if bodyVelocity then
-                bodyVelocity:Destroy()
-            end
-        end
     end, 
-    "Activates MovementHack lets you fly"
-)
-
+    "Activates MovementHack let's you fly")
+    
 local t7 = Main:AddToggle("AntiVoid", false, 
     function(state) 
     end, 
@@ -1066,7 +1003,7 @@ function spawnBombSpam()
                 respawn()
             end
         end
-        wait(0.1)  -- Reduced wait time to increase speed
+        wait(0.1)  
     end
 end
 
@@ -1076,6 +1013,9 @@ end
 
 local t23 = Tools:AddToggle("BombFIingSelected", false, 
     function(state) 
+    if state then
+        [SelectedPlayer.Id]
+        for _, v in next
     end, 
     "BombFIings SelectedPlayer")
 
@@ -1376,7 +1316,8 @@ x10.FocusLost:Connect(function()
 end)
 
 local x11 = Keybinds:AddBox("View", "Type any Letter to Change Bind")
-x11.FocusLost:Connect(function()
+x11.FocusLost:C
+onnect(function()
 end)
 
 local x12 = Keybinds:AddBox("HatFIing", "Type any Letter to Change Bind")
