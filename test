@@ -1,3 +1,21 @@
+-- Script inside a LocalScript
+
+local StarterGui = game:GetService("StarterGui")
+
+-- Function to send a notification
+local function sendNotification(title, text)
+    StarterGui:SetCore("SendNotification", {
+        Title = title,  -- The title of the notification
+        Text = text,    -- The body text of the notification
+        Icon = "rbxassetid://1234567890",  -- Optional: You can use an asset ID for an icon (replace with actual asset ID)
+        Duration = 5     -- The duration the notification will stay on the screen (in seconds)
+    })
+end
+
+-- Example usage of the function
+sendNotification("Welcome!", "Thanks for joining the game!")
+
+
 local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("GUI")
 if FGUI then
     FGUI:Destroy()
