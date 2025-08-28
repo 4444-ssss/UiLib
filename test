@@ -18,13 +18,8 @@ local killAll = false
 local Radius = 3.4
 local Speed = 2.2
 local Height = 1.6
+workspace.FallenPartsDestroyHeight = 0/0
 local Velocity = -9e37
-local anvilKillToggle = false
-local anvilKillAllToggle = false
-local anvilOrbitToggle = false
-local anvilEnabled = false
-
-
 
 local function findplr(Target)
     local player = plrs:FindFirstChild(Target)
@@ -562,6 +557,11 @@ local b2 = Main:AddButton("PermaGod",
 
 local Tools = Lib.AddPage("Tools", "Show's Tools Tab")
 
+
+local anvilKillToggle = false
+local anvilKillAllToggle = false
+local anvilOrbitToggle = false
+
 local function addAnvil(anvil)
     table.insert(anvils, anvil)
     anvil.Parent = workspace
@@ -614,13 +614,6 @@ local function stopAnvils()
     anvilOrbitToggle = false
 end
 
-local function CharacterAdded(Character)
-    character = Character
-    head = Character:WaitForChild("Head")
-    FindAnvils()
-end
-plr.CharacterAdded:Connect(CharacterAdded)
-
 rs.Heartbeat:Connect(function()
     if anvilOrbitToggle then
         AnvilPosition()
@@ -628,6 +621,27 @@ rs.Heartbeat:Connect(function()
         stopAnvils()
     end
 end)
+
+local function CharacterAdded(Character)
+    character = Character
+    head = Character:WaitForChild("Head")
+    FindAnvils()
+end
+plr.CharacterAdded:Connect(CharacterAdded)
+
+workspace.ChildAdded:Connect(function(child)
+    if child:IsA("BasePart") and child.Name == "Anvil" then
+        addAnvil(child)
+    end
+end)
+
+coroutine.wrap(function()
+    while true do
+        FindAnvils()
+        task.wait()
+    end
+end)()
+
 
 local x6 = Tools:AddBox("SelectPlayer", "Type Player(s) Name or Display")
 x6.FocusLost:Connect(function()
@@ -674,17 +688,42 @@ local t17 = Tools:AddToggle("AnvilOrbit", false,
     "Orbits Anvil When Thrown"
 )
 
-local t20 = Tools:AddToggle("AutoThrow", false, 
+local t18 = Tools:AddToggle("FIingAnvils", false, 
     function(state) 
-        anvilEnabled = state
         if state then
-            if not plr.Character:FindFirstChild("Anvil") then
-                activateAnvil()
+            local function c()
+                rs.Heartbeat:Connect(function()
+                    if not plr.Parent then return end
+                    for _, v in pairs(workspace:GetChildren()) do
+                        if v:IsA("BasePart") and v.Name == "Anvil" and v:FindFirstChild("Script") and v.Script:FindFirstChild("Value") and v.Script.Value ~= plr then
+                            plr.Character.Picking:FireServer(v, Vector3.new(9e38, -9e38, 9e38))
+                            task.wait(0.1)
+                            plr.Character.PuttingDown:FireServer()
+                        end
+                    end
+                end)
             end
+
+            c()
+        else
+  plr.Character.PuttingDown:FireServer()
         end
     end, 
-    "AutoThrows Anvil"
+    "FIings All Anvils")
+
+local t19 = Tools:AddToggle("HideAnvil", false, 
+    function(state) 
+        if state then
+            Height = -900
+        else
+            Height = 3
+        end
+    end, 
+    "Hides Anvils"
 )
+
+
+local anvilEnabled = false
 
 local function activateAnvil()
     if anvilEnabled then
@@ -720,6 +759,29 @@ local function activateAnvil()
                 end
             end
         end
+    end
+end
+
+local t20 = Tools:AddToggle("AutoThrow", false, 
+    function(state) 
+        anvilEnabled = state
+        if state then
+            if not plr.Character:FindFirstChild("Anvil") then
+                activateAnvil()
+            end
+        end
+    end, 
+    "AutoThrows Anvil")
+
+anvilConnection = plr.CharacterAdded:Connect(function()
+    if anvilEnabled and not plr.Character:FindFirstChild("Anvil") then
+        activateAnvil()
+    end
+end)
+
+if plr.Character then
+    if anvilEnabled and not plr.Character:FindFirstChild("Anvil") then
+        activateAnvil()
     end
 end
 
@@ -800,6 +862,7 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
                 end
             end)
         else
+            -- When toggle is off, disconnect the connection and move the tool back to the backpack
             if connection then
                 connection:Disconnect()
             end
@@ -813,37 +876,11 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
     "AutoPunches SelectedPlayer"
 )
 
+
 local t22 = Tools:AddToggle("SpamBomb", false, 
     function(state) 
-        if state then
-            spawnBombSpam()
-        else
-            stopBombSpam()
-        end
     end, 
-    "SpamsBomb"
-)
-
-local bombingActive = false
-
-function spawnBombSpam()
-    bombingActive = true
-    while bombingActive do
-        local plr = game.Players.LocalPlayer
-        for _, v in next, plr.Backpack:GetChildren() do
-            if v.Name == "Bomb" then
-                v.Parent = plr.Character
-                v:Activate()
-                respawn()
-            end
-        end
-        wait(0.1)  
-    end
-end
-
-function stopBombSpam()
-    bombingActive = false
-end
+    "SpamsBomb")
 
 local t23 = Tools:AddToggle("BombFIingSelected", false, 
     function(state) 
@@ -852,10 +889,7 @@ local t23 = Tools:AddToggle("BombFIingSelected", false,
 
 local Global = Lib.AddPage("Global", "Show's Global Tab")
 
-local t24 = Global:AddToggle("BreakMap", false, 
-    function(state) 
-    end, 
-    "Breaks the Map")
+
 
 local t25 = Global:AddToggle("LagServer", false, 
     function(state) 
@@ -867,10 +901,39 @@ local t26 = Global:AddToggle("DamageSound", false,
     end, 
     "Annoys Player(s) With the Loud Sound")
 
-local t27 = Global:AddToggle("FIingMapItems", false, 
-    function(state) 
-    end, 
-    "FIings All UnAnchored Items")
+local t27
+local flinging = false
+local flingitemsconn
+
+t27 = Global:AddToggle("FIingMapItems", false, function(state)
+    local plr = game.Players.LocalPlayer
+    local pickableFolder = workspace:FindFirstChild("Map") 
+        and workspace.Map:FindFirstChild("Map") 
+        and workspace.Map.Map:FindFirstChild("Pickable")
+
+    if state and pickableFolder then
+        flinging = true
+        flingitemsconn = task.spawn(function()
+            while flinging do
+                for _, v in next, pickableFolder:GetChildren() do
+                    if v:IsA("BasePart") and not v.Anchored then
+                        plr.Character.Picking:FireServer(v, Vector3.new(math.huge, -math.huge, math.huge))
+                        task.wait(0.05)
+                        plr.Character.PuttingDown:FireServer()
+                    end
+                end
+                task.wait()
+            end
+        end)
+    else
+        plr.Character.PuttingDown:FireServer()
+        flinging = false
+        if flingitemsconn then
+            task.cancel(flingitemsconn)
+            flingitemsconn = nil
+        end
+    end
+end, "FIings All UnAnchored Items")
 
 local t28 = Global:AddToggle("BugMap", false, 
     function(state) 
