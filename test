@@ -378,118 +378,30 @@ end
 
 local Main = Lib.AddPage("Main", "Show's Main Tab")
 
-local t1 = Main:AddToggle("AntiFling", false, 
+local t1 = Main:AddToggle("AntiFIing", false, 
     function(state) 
-        local function gw(o) return o:FindFirstChild("ConnectedWeld") end
-        local function ic(w) return w and w.Part1 and w.Part1:IsDescendantOf(plr.Character) end
-        local function d(o) local w = gw(o) if ic(w) then o:Destroy() end end
-
-        local function mp(p) return p:IsA("BasePart") and p.Name ~= "HumanoidRootPart" end
-        local function mm(p) p.Massless = true end
-        local function ma(character) for _,v in ipairs(character:GetDescendants()) do if mp(v) then mm(v) end end end
-
-        local function ga(character) return character:FindFirstChild("ArmAngleChange") end
-        local function cf()
-            return CFrame.new(0.999999583, 0.650959253, 0.0507530943,
-            0.994099438, 0.0974220186, 0.0476996154,
-            -0.0791255683, 0.952069402, -0.295470744,
-            -0.074198693, 0.289953023, 0.954160273)
-        end
-        local function sa(character) local e = ga(character) if e then e:FireServer(cf()) end end
-
-        local function loop()
-            while character and plr.Character == character do
-                if state then
-                    ma(character)
-                    sa(character)
-                end
-                task.wait(0.2)
-            end
-        end
-
-        if state then
-            -- Turn AntiFling ON
-            workspace.DescendantAdded:Connect(function(o)
-                if o.Name == "Stabler" then
-                    task.spawn(function()
-                        if gw(o) or o:WaitForChild("ConnectedWeld", 10) then d(o) end
-                    end)
-                end
-            end)
-
-            task.spawn(loop)
-
-            plr.CharacterAdded:Connect(function(nc)
-                character = nc
-                task.spawn(loop)
-            end)
-        else
-            -- Turn AntiFling OFF
-            for _,v in next,plr.Character:GetChildren() do
-                if v.Name == 'Stabler' then
-                    v:Destroy()  -- Clean up if AntiFling is turned off
-                end
-            end
-        end
     end, 
-    "Prevents your character from being flung")
+    "Prevents from getting Flung")
 
 local t2 = Main:AddToggle("AntiRagdoll", false, 
     function(state) 
-        if state then
-            pcall(function()
-                plr.Character.Ragdoll:Destroy()
-            end)
-        end
     end, 
-    "Prevents from ragdolling")
+    "Prevents from Ragdolling")
 
-local t3 = Main:AddToggle("AntiVelocity", false, 
+local t3 = Main:AddToggle("NoFallDamage", false, 
     function(state) 
-        if state then
-            pcall(function()
-                plr.Character.HumanoidRootPart.Velocity = vec0
-                plr.Character.HumanoidRootPart.RotVelocity = vec0
-            end)
-        end
     end, 
-    "Velocity damage won't affect your character")
+    "FallDamage Won't Effect")
 
 local t4 = Main:AddToggle("AntiSpinner", false, 
     function(state) 
-        if state then
-            pcall(function()
-                for _,v in next,plr.Character:GetChildren() do
-                    if v:IsA('BasePart') then
-                        v.CustomPhysicalProperties = prop1000
-                    end
-                end
-            end)
-        else
-            pcall(function()
-                for _,v in next,plr.Character:GetDescendants() do
-                    if v:IsA('BasePart') then
-                        v.CustomPhysicalProperties = PhysicalProperties.new(0.3,0.2,0,0.2,0.2)
-                    end
-                end
-            end)
-        end
     end, 
-    "Prevents from getting flung by spinners")
+    "Activates/Deactivates AntiSpinner")
 
 local t5 = Main:AddToggle("AutoRespawn", false, 
     function(state) 
-        if state then
-            game:GetService("Players").LocalPlayer.Character:WaitForChild("Humanoid").Died:Connect(function()
-                wait(1)
-                respawn()
-            end)
-        else
-            game:GetService("Players").LocalPlayer.Character:WaitForChild("Humanoid").Died:Disconnect()
-        end
     end, 
-    "AutoRespawns By its own"
-)
+    "AutoRespawns By its own")
 
 local t6 = Main:AddToggle("MovementHack", false, 
     function(state) 
@@ -1109,54 +1021,11 @@ local t29 = Misc:AddToggle("BetterAnvil", false,
     "Makes your Anvil Better And Stronger")
 
 
+
 local t30 = Misc:AddToggle("Invisible", false, 
     function(state) 
-        if not character or not character:FindFirstChild("HumanoidRootPart") then
-            return
-        end
-
-        if state then
-            local position = character.HumanoidRootPart.Position
-            character:MoveTo(position + Vector3.new(0, 1000000, 0))
-            wait(0.1)
-
-            local humanoidRootPartClone = character.HumanoidRootPart:Clone()
-            wait(0.1)
-            character.HumanoidRootPart:Destroy()
-            humanoidRootPartClone.Parent = character
-            character:MoveTo(position)
-            wait()
-
-            for _, part in pairs(character:GetChildren()) do
-                if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                    part.Transparency = 0.5
-                    part.CanCollide = false
-                end
-            end
-
-            if character:FindFirstChild("Humanoid") then
-                character.Humanoid:RemoveAccessories()
-            end
-            if character.Head:FindFirstChild("face") then
-                character.Head.face:Destroy()
-            end
-        else
-            for _, part in pairs(character:GetChildren()) do
-                if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
-                    part.Transparency = 0
-                    part.CanCollide = true
-                end
-            end
-
-            if character:FindFirstChild("Humanoid") then
-                for _, accessory in pairs(character.Humanoid:GetAccessories()) do
-                    accessory.Parent = character
-                end
-            end
-        end
     end, 
-    "Makes you Invisible"
-)
+    "Makes you Invisible")
 
 local t31 = Misc:AddToggle("PickViewer", false, 
     function(state) 
@@ -1170,41 +1039,9 @@ local t32 = Misc:AddToggle("AutoSword", false,
 
 local t33 = Misc:AddToggle("AutoFarm", false, 
     function(state) 
-        if state then
-            local function startAutoFarm()
-                while state do
-                    pcall(function()
-                        local char = plr.Character
-                        repeat wait() until plr.PlayerGui.DeathMenu.Frame.Button:FindFirstChild'TextButton' and char:FindFirstChild'HumanoidRootPart' and (plr.Backpack:FindFirstChild'Punch' or char:FindFirstChild'Punch')
-                        local tool = plr.Backpack:FindFirstChild'Punch' or plr.Character:FindFirstChild'Punch'
-                        tool.Parent = plr.Character
-                        tool:Activate()
-                        plr.Character.RagdollEvent:FireServer()
-                        wait(0.1)
-                        firetouchinterest(char.RightHand, char.HumanoidRootPart, 0)
-                        firetouchinterest(char.RightHand, char.HumanoidRootPart, 1)
-                        respawn()
-                        spawn(function()
-                            pcall(function()
-                                wait(0.1)
-                                if char then
-                                    repeat respawn() wait(0.1) until not char or not char.Parent
-                                end
-                            end)
-                        end)
-                        plr.CharacterAdded:wait()
-                    end)
-                end
-            end
-
-            startAutoFarm()
-
-        else
-            state = false
-        end
     end, 
-    "AutoFarm's Points"
-)
+    "AutoFarm's Points")
+
 local t34 = Misc:AddToggle("LowPing", false, 
     function(state)
         if state then
