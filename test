@@ -1,8 +1,8 @@
-
 local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("GUI")
 if FGUI then
     FGUI:Destroy()
 end
+
 local wspace = game:GetService("Workspace")
 local rs = game:GetService('RunService')
 local plrs = game:GetService("Players")
@@ -495,7 +495,7 @@ local t6 = Main:AddToggle("MovementHack", false,
     function(state) 
     end, 
     "Activates MovementHack let's you fly")
-    
+
 local t7 = Main:AddToggle("AntiVoid", false, 
     function(state) 
     end, 
