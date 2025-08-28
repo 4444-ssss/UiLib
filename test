@@ -2,16 +2,14 @@ local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("
 if FGUI then
     FGUI:Destroy()
 end
-
-local wspace = game:GetService("Workspace")
 local rs = game:GetService('RunService')
 local plrs = game:GetService("Players")
 local plr = plrs.LocalPlayer
 local vim = game:GetService('VirtualInputManager')
 local ts = game:GetService('TweenService')
-local character = plr.Character or plr.CharacterAdded:Wait()
 local LoopFlingV1 = {}
 local LoopFlingV2 = {}
+local character = plr.Character or plr.CharacterAdded:Wait()
 local head = character:WaitForChild("Head")
 local anvils = {}
 local targets = {}
@@ -20,10 +18,13 @@ local killAll = false
 local Radius = 3.4
 local Speed = 2.2
 local Height = 1.6
-workspace.FallenPartsDestroyHeight = 0/0
 local Velocity = -9e37
-local vec0 = Vector3.new()
-local prop1000 = PhysicalProperties.new(1000,1000,0,1000,0)
+local anvilKillToggle = false
+local anvilKillAllToggle = false
+local anvilOrbitToggle = false
+local anvilEnabled = false
+
+
 
 local function findplr(Target)
     local player = plrs:FindFirstChild(Target)
@@ -39,7 +40,6 @@ local function findplr(Target)
     return nil
 end
 
--- Ensure GUI initialization
 local GUI = Instance.new("ScreenGui")
 local Container = Instance.new("Frame")
 local lbl = Instance.new("TextLabel")
@@ -74,7 +74,6 @@ lbl.TextSize = 25
 lbl.TextWrapped = true
 lbl.TextXAlignment = Enum.TextXAlignment.Left
 
--- Fix the respawn function to be valid
 local function respawn()
     pcall(function()
         local b = plr.PlayerGui.DeathMenu.Frame.Button.TextButton
@@ -94,7 +93,6 @@ local function respawn()
     end)
 end
 
--- Fixed: ensure event connections are valid
 local Refresh = Instance.new('TextButton', GUI)
 Refresh.Name = "Refresh"
 Refresh.AnchorPoint = Vector2.new(1, 0)
@@ -121,14 +119,13 @@ RespawnButton.TextScaled = true
 RespawnButton.TextSize = 14.000
 RespawnButton.TextWrapped = true
 
--- Fix the event connections here
 Refresh.MouseButton1Up:Connect(function()
     pcall(function()
-        local oldpos = plr.Character.HumanoidRootPart.CFrame
-        local camcf = workspace.CurrentCamera.CFrame
+        oldpos = plr.Character.HumanoidRootPart.CFrame
+        camcf = workspace.CurrentCamera.CFrame
         respawn()
         plr.CharacterAdded:wait()
-        repeat rs.RenderStepped:wait() until plr.Character:FindFirstChild('HumanoidRootPart') and plr.Character:FindFirstChildOfClass('Humanoid')
+        repeat rs.RenderStepped:wait() until plr.Character:FindFirstChild'HumanoidRootPart' and plr.Character:FindFirstChildOfClass'Humanoid'
         for i = 1, 10 do
             ts:Create(plr.Character.HumanoidRootPart, TweenInfo.new(0), {CFrame = oldpos}):Play()
         end
@@ -140,7 +137,6 @@ RespawnButton.MouseButton1Up:Connect(function()
     respawn()
 end)
 
--- Continue fixing other parts of the script similarly..
 HolderPage.Name = "HolderPage"
 HolderPage.Parent = Container
 HolderPage.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -560,48 +556,11 @@ local t14 = Main:AddToggle("Virus", false,
     "TouchFIing FIings Players you Touch")
 
 local b2 = Main:AddButton("PermaGod", 
-    function()
-
-        local function godmode(char)
-            pcall(function()
-                for _,v in next,char:GetChildren() do
-                    if v.Name == "VelocityDamage" or v.Name == "GetPicked" or v.Name == "ArmAngleUpdate" then
-                        v:Destroy()
-                    end
-                end
-            end)
-            pcall(function()
-                local hum = char:FindFirstChildOfClass("Humanoid")
-                if hum then
-                    local cl = hum:Clone()
-                    cl.Parent = char
-                    hum.Parent = nil
-                    cl:GetPropertyChangedSignal("Health"):Connect(function()
-                        if cl.Health <= 0 then
-                            hum.Parent = char
-                            task.wait(1)
-                            hum:Destroy()
-                        end
-                    end)
-                    workspace.CurrentCamera.CameraSubject = char
-                end
-            end)
-        end
-
-        godmode(plr.Character)
-        plr.CharacterAdded:Connect(function(char)
-            repeat task.wait() until char:FindFirstChildOfClass("Humanoid")
-            godmode(char)
-        end)
+    function() 
     end, 
     "Gives PermaGod")
 
 local Tools = Lib.AddPage("Tools", "Show's Tools Tab")
-
-
-local anvilKillToggle = false
-local anvilKillAllToggle = false
-local anvilOrbitToggle = false
 
 local function addAnvil(anvil)
     table.insert(anvils, anvil)
@@ -655,14 +614,6 @@ local function stopAnvils()
     anvilOrbitToggle = false
 end
 
-rs.Heartbeat:Connect(function()
-    if anvilOrbitToggle then
-        AnvilPosition()
-    else
-        stopAnvils()
-    end
-end)
-
 local function CharacterAdded(Character)
     character = Character
     head = Character:WaitForChild("Head")
@@ -670,19 +621,13 @@ local function CharacterAdded(Character)
 end
 plr.CharacterAdded:Connect(CharacterAdded)
 
-workspace.ChildAdded:Connect(function(child)
-    if child:IsA("BasePart") and child.Name == "Anvil" then
-        addAnvil(child)
+rs.Heartbeat:Connect(function()
+    if anvilOrbitToggle then
+        AnvilPosition()
+    else
+        stopAnvils()
     end
 end)
-
-coroutine.wrap(function()
-    while true do
-        FindAnvils()
-        task.wait()
-    end
-end)()
-
 
 local x6 = Tools:AddBox("SelectPlayer", "Type Player(s) Name or Display")
 x6.FocusLost:Connect(function()
@@ -729,18 +674,17 @@ local t17 = Tools:AddToggle("AnvilOrbit", false,
     "Orbits Anvil When Thrown"
 )
 
-local t18 = Tools:AddToggle("FIingAnvils", false, 
+local t20 = Tools:AddToggle("AutoThrow", false, 
     function(state) 
+        anvilEnabled = state
+        if state then
+            if not plr.Character:FindFirstChild("Anvil") then
+                activateAnvil()
+            end
+        end
     end, 
-    "FIings All Anvils")
-
-
-local t19 = Tools:AddToggle("HideAnvil", false, 
-    function(state) 
-    end, 
-    "HidesAnvils")
-
-local anvilEnabled = false
+    "AutoThrows Anvil"
+)
 
 local function activateAnvil()
     if anvilEnabled then
@@ -776,29 +720,6 @@ local function activateAnvil()
                 end
             end
         end
-    end
-end
-
-local t20 = Tools:AddToggle("AutoThrow", false, 
-    function(state) 
-        anvilEnabled = state
-        if state then
-            if not plr.Character:FindFirstChild("Anvil") then
-                activateAnvil()
-            end
-        end
-    end, 
-    "AutoThrows Anvil")
-
-anvilConnection = plr.CharacterAdded:Connect(function()
-    if anvilEnabled and not plr.Character:FindFirstChild("Anvil") then
-        activateAnvil()
-    end
-end)
-
-if plr.Character then
-    if anvilEnabled and not plr.Character:FindFirstChild("Anvil") then
-        activateAnvil()
     end
 end
 
@@ -879,7 +800,6 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
                 end
             end)
         else
-            -- When toggle is off, disconnect the connection and move the tool back to the backpack
             if connection then
                 connection:Disconnect()
             end
@@ -893,7 +813,6 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
     "AutoPunches SelectedPlayer"
 )
 
-
 local t22 = Tools:AddToggle("SpamBomb", false, 
     function(state) 
         if state then
@@ -902,7 +821,8 @@ local t22 = Tools:AddToggle("SpamBomb", false,
             stopBombSpam()
         end
     end, 
-    "SpamsBomb")
+    "SpamsBomb"
+)
 
 local bombingActive = false
 
@@ -927,9 +847,6 @@ end
 
 local t23 = Tools:AddToggle("BombFIingSelected", false, 
     function(state) 
-    if state then
-        [SelectedPlayer.Id]
-        for _, v in next
     end, 
     "BombFIings SelectedPlayer")
 
@@ -964,67 +881,18 @@ local Misc = Lib.AddPage("Misc", "Show's Misc Tab")
 
 local b5 = Misc:AddButton("Big Jacket", 
     function() 
-        pcall(function()
-
-            for _, v in next, character:GetChildren() do
-                if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
-                    v.Massless = true
-                end
-            end
-
-            pcall(function()
-                character.BodyFollowMouse.Disabled = true
-            end)
-
-            character.RagdollEvent:FireServer()
-            wait()
-            character.HeadWaist:FireServer(CFrame.new(0,0,9e37), CFrame.new(0,0,9e37))
-            wait()
-            character.HeadWaist:FireServer(CFrame.new(0,0,-9e37), CFrame.new(0,0,-9e37))
-            wait()
-            character.GetUpEvent:FireServer()
-            wait()
-            character.HeadWaist:FireServer(CFrame.new(0,0.8,0), CFrame.new(0,0.2,0))
-            character.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
-            character.HumanoidRootPart.CFrame = character.HumanoidRootPart.CFrame + Vector3.new(0,5,0)
-        end)
     end, 
-    "Must Have Layered (Clothing, Jacket,)"
-)
+    "Must Have Layered (Clothing, Jacket,)")
 
-local b6 = Misc:AddButton("Legs Fling", 
+local b6 = Misc:AddButton("Legs FIing", 
     function() 
-        pcall(function()
-            for _,v in next,plr.Character:GetChildren() do
-                if v:IsA'BasePart' and v.Name~='HumanoidRootPart' then
-                    v.Massless = true
-                end
-            end
-            pcall(function()
-                plr.Character.BodyFollowMouse.Disabled = true
-            end)
-            plr.Character.HeadWaist:FireServer(CFrame.new(0,9e37,-9e37),CFrame.new(0,-9e37,9e37))
-        end)
     end, 
-    "Deletes your Torso and Flings People when Touch"
-)
+    "Deletes your Torso and FIings People when Touch")
 
 local t29 = Misc:AddToggle("BetterAnvil", false, 
-    function(state)
-        if state then
-            local function updateAnvilVelocity()
-                for _, v in pairs(workspace:GetChildren()) do
-                    if v:IsA("BasePart") and v.Name == 'Anvil' and v:FindFirstChild('Script') and v.Script:FindFirstChild('Value') and v.Script.Value.Value == plr then
-                        v.Velocity = -9e38
-                    end
-                end
-            end
-            updateAnvilVelocity()
-        end
+    function(state) 
     end, 
     "Makes your Anvil Better And Stronger")
-
-
 
 local t30 = Misc:AddToggle("Invisible", false, 
     function(state) 
@@ -1047,14 +915,7 @@ local t33 = Misc:AddToggle("AutoFarm", false,
     "AutoFarm's Points")
 
 local t34 = Misc:AddToggle("LowPing", false, 
-    function(state)
-        if state then
-            plr.Character.BodyFollowMouse.Disabled = true
-            plr.Character.HeadWaist:FireServer(CFrame.new(0,0.8,0), CFrame.new(0,0.2,0))
-        else
-            plr.Character.BodyFollowMouse.Disabled = false
-            plr.Character.HeadWaist:FireServer(CFrame.new(0,0,9e37), CFrame.new(0,0,-9e37))
-        end
+    function(state) 
     end, 
     "Boost Internet and Lowers Ping")
 
@@ -1063,58 +924,20 @@ local t35 = Misc:AddToggle("AntiV2All", false,
     end, 
     "Gives Everyone AntiFIingV2")
 
-local isEnabled = false
-
-local t36 = Misc:AddToggle("AntiAnvil", false, function(state)
-    isEnabled = state
-end, "Fling Anvils")
-
-local antianvilconn
-antianvilconn = rs.Heartbeat:Connect(function()
-    if not isEnabled then
-        return
-    end
-
-    for _, v in pairs(game.Players:GetPlayers()) do
-        if v ~= game.Players.LocalPlayer then
-            pcall(function()
-                if v.Character and v.Character:FindFirstChild("Anvil") then
-                    v.Character.Anvil.send:FireServer(CFrame.new(-9e38, -9e38, -9e38))
-                end
-            end)
-        end
-    end
-end)
+local t36 = Misc:AddToggle("AntiAnvil", false, 
+    function(state) 
+    end, 
+    "FIings Anvils")
 
 local b7 = Misc:AddButton("Spawn", 
     function() 
-        pcall(function()
-            for _,v in next,workspace.Map:GetDescendants() do
-                if v:IsA'SpawnLocation' then
-                    plr.Character.HumanoidRootPart.CFrame = v.CFrame*CFrame.new(0,5,0)
-                end
-            end
-        end)
     end, 
-    "Teleports to Spawn"
-)
+    "Teleports to Spawn")
 
 local b8 = Misc:AddButton("SafeZone", 
     function() 
-        pcall(function()
-            local safeZonePart = Instance.new("Part")
-            safeZonePart.Name = "SafeZone"
-            safeZonePart.Size = Vector3.new(500, 3, 500)
-            safeZonePart.Position = Vector3.new(1000, 50, 1000)
-            safeZonePart.Anchored = true
-            safeZonePart.Parent = workspace
-            
-            plr.Character.HumanoidRootPart.CFrame = CFrame.new(1000, 51, 1000)
-        end)
     end, 
-    "Teleports To SafeZone"
-)
-
+    "Teleports To SafeZone")
 
 local t37 = Misc:AddToggle("ToolController", false, 
     function(state) 
@@ -1155,8 +978,7 @@ x10.FocusLost:Connect(function()
 end)
 
 local x11 = Keybinds:AddBox("View", "Type any Letter to Change Bind")
-x11.FocusLost:C
-onnect(function()
+x11.FocusLost:Connect(function()
 end)
 
 local x12 = Keybinds:AddBox("HatFIing", "Type any Letter to Change Bind")
