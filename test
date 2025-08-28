@@ -1,5 +1,3 @@
--- ? 1k?
-
 
 local FGUI = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("GUI")
 if FGUI then
