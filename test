@@ -353,7 +353,7 @@ function pageApi:AddBox(placeholderText, hovertipText)
     local baseText = lbl.Text
 
     Box.MouseEnter:Connect(function()
-        -- Animate hover tip text
+        
         local hoverText = hovertipText or ("Input: " .. (Box.Text == "" and "(empty)" or Box.Text))
         typeIntoLabel(hoverText)
     end)
@@ -862,7 +862,7 @@ local t21 = Tools:AddToggle("AutoPunchSelected", false,
                 end
             end)
         else
-            -- When toggle is off, disconnect the connection and move the tool back to the backpack
+            
             if connection then
                 connection:Disconnect()
             end
