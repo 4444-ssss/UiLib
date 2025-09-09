@@ -1,1 +1,223 @@
 
+--// Destroy old UI if exists
+if game:GetService("CoreGui"):FindFirstChild("NxUI") then
+    game:GetService("CoreGui").NxUI:Destroy()
+end
+
+--// Services
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+
+--// Main Library
+local Library = {}
+Library.__index = Library
+
+--// Create Window
+function Library:CreateWindow(settings)
+    settings = settings or {}
+    local title = settings.Title or "Nx UI"
+    local subtitle = settings.Subtitle or ""
+    local user = settings.User or "User"
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "NxUI"
+    ScreenGui.Parent = CoreGui
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0, 650, 0, 400)
+    MainFrame.Position = UDim2.new(0.5, -325, 0.5, -200)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    MainFrame.Parent = ScreenGui
+    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+
+    -- Header
+    local Header = Instance.new("Frame", MainFrame)
+    Header.Size = UDim2.new(1, 0, 0, 60)
+    Header.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Header.BorderSizePixel = 0
+    Instance.new("UICorner", Header).CornerRadius = UDim.new(0, 10)
+
+    local Title = Instance.new("TextLabel", Header)
+    Title.Size = UDim2.new(1, -20, 0.5, 0)
+    Title.Position = UDim2.new(0, 10, 0, 5)
+    Title.Text = title
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 18
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.BackgroundTransparency = 1
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+
+    local Subtitle = Instance.new("TextLabel", Header)
+    Subtitle.Size = UDim2.new(1, -20, 0.5, 0)
+    Subtitle.Position = UDim2.new(0, 10, 0.5, 0)
+    Subtitle.Text = subtitle .. "  |  " .. user
+    Subtitle.Font = Enum.Font.Gotham
+    Subtitle.TextSize = 14
+    Subtitle.TextColor3 = Color3.fromRGB(180, 180, 180)
+    Subtitle.BackgroundTransparency = 1
+    Subtitle.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Left Tab Holder
+    local TabHolder = Instance.new("Frame", MainFrame)
+    TabHolder.Size = UDim2.new(0, 160, 1, -60)
+    TabHolder.Position = UDim2.new(0, 0, 0, 60)
+    TabHolder.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    TabHolder.BorderSizePixel = 0
+
+    local TabLayout = Instance.new("UIListLayout", TabHolder)
+    TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    TabLayout.Padding = UDim.new(0, 5)
+
+    -- Content Holder
+    local ContentFrame = Instance.new("Frame", MainFrame)
+    ContentFrame.Size = UDim2.new(1, -160, 1, -60)
+    ContentFrame.Position = UDim2.new(0, 160, 0, 60)
+    ContentFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    ContentFrame.BorderSizePixel = 0
+
+    local PageLayout = Instance.new("UIPageLayout", ContentFrame)
+    PageLayout.FillDirection = Enum.FillDirection.Horizontal
+    PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    PageLayout.EasingStyle = Enum.EasingStyle.Quint
+    PageLayout.TweenTime = 0.3
+
+    local Tabs = {}
+
+    -- Add Tab
+    function Library:AddTab(tabName)
+        local TabButton = Instance.new("TextButton", TabHolder)
+        TabButton.Text = tabName
+        TabButton.Size = UDim2.new(1, -10, 0, 35)
+        TabButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        TabButton.Font = Enum.Font.Gotham
+        TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        TabButton.TextSize = 14
+        TabButton.BorderSizePixel = 0
+        Instance.new("UICorner", TabButton).CornerRadius = UDim.new(0, 8)
+
+        local TabFrame = Instance.new("ScrollingFrame", ContentFrame)
+        TabFrame.Size = UDim2.new(1, 0, 1, 0)
+        TabFrame.BackgroundTransparency = 1
+        TabFrame.BorderSizePixel = 0
+        TabFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+        TabFrame.ScrollBarThickness = 6
+
+        local Layout = Instance.new("UIListLayout", TabFrame)
+        Layout.Padding = UDim.new(0, 8)
+        Layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+        TabButton.MouseButton1Click:Connect(function()
+            PageLayout:JumpTo(TabFrame)
+        end)
+
+        local Elements = {}
+
+        function Elements:AddLabel(text)
+            local Label = Instance.new("TextLabel", TabFrame)
+            Label.Size = UDim2.new(1, -10, 0, 30)
+            Label.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            Label.Text = text
+            Label.Font = Enum.Font.Gotham
+            Label.TextSize = 14
+            Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Label.BorderSizePixel = 0
+            Instance.new("UICorner", Label).CornerRadius = UDim.new(0, 6)
+            return Label
+        end
+
+        function Elements:AddButton(text, callback)
+            local Button = Instance.new("TextButton", TabFrame)
+            Button.Size = UDim2.new(1, -10, 0, 30)
+            Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            Button.Text = text
+            Button.Font = Enum.Font.GothamBold
+            Button.TextSize = 14
+            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Button.BorderSizePixel = 0
+            Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 6)
+            Button.MouseButton1Click:Connect(function()
+                if callback then callback() end
+            end)
+            return Button
+        end
+
+        function Elements:AddToggle(text, default, callback)
+            local Toggle = Instance.new("TextButton", TabFrame)
+            Toggle.Size = UDim2.new(1, -10, 0, 30)
+            Toggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            Toggle.Text = text .. (default and " [ON]" or " [OFF]")
+            Toggle.Font = Enum.Font.Gotham
+            Toggle.TextSize = 14
+            Toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Toggle.BorderSizePixel = 0
+            Instance.new("UICorner", Toggle).CornerRadius = UDim.new(0, 6)
+
+            local state = default or false
+            Toggle.MouseButton1Click:Connect(function()
+                state = not state
+                Toggle.Text = text .. (state and " [ON]" or " [OFF]")
+                if callback then callback(state) end
+            end)
+            return Toggle
+        end
+
+        function Elements:AddBox(placeholder, callback)
+            local Box = Instance.new("TextBox", TabFrame)
+            Box.Size = UDim2.new(1, -10, 0, 30)
+            Box.PlaceholderText = placeholder
+            Box.Text = ""
+            Box.Font = Enum.Font.Gotham
+            Box.TextSize = 14
+            Box.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Box.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            Box.BorderSizePixel = 0
+            Instance.new("UICorner", Box).CornerRadius = UDim.new(0, 6)
+            Box.FocusLost:Connect(function()
+                if callback then callback(Box.Text) end
+            end)
+            return Box
+        end
+
+        function Elements:AddBind(defaultKey, callback)
+            local Button = Instance.new("TextButton", TabFrame)
+            Button.Size = UDim2.new(1, -10, 0, 30)
+            Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            Button.Text = "Keybind: " .. defaultKey.Name
+            Button.Font = Enum.Font.Gotham
+            Button.TextSize = 14
+            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Button.BorderSizePixel = 0
+            Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 6)
+
+            local key = defaultKey
+            UserInputService.InputBegan:Connect(function(input, gpe)
+                if not gpe and input.KeyCode == key then
+                    if callback then callback() end
+                end
+            end)
+
+            Button.MouseButton1Click:Connect(function()
+                Button.Text = "Press a key..."
+                local conn
+                conn = UserInputService.InputBegan:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.Keyboard then
+                        key = input.KeyCode
+                        Button.Text = "Keybind: " .. key.Name
+                        conn:Disconnect()
+                    end
+                end)
+            end)
+            return Button
+        end
+
+        Tabs[tabName] = Elements
+        return Elements
+    end
+
+    return Library
+end
+
+return Library
